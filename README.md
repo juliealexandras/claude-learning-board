@@ -114,7 +114,10 @@ A weekly GitHub Action checks every link and opens an issue when one breaks. Ano
 
 ## Good to know
 
-- The board supports light and dark mode, works on phones, and has no dependencies beyond Google Fonts. It falls back to system fonts offline.
+- The board has a 90s floppy disk look: each card is a disk in its track color, with a ripped label for Did not finish and a stamp for Done. It's dark only by design.
+- Each board shows six disks, then scrolls inside itself with a counter like "1–6 of 17".
+- Type is Futura PT when you have it installed or in an Adobe Fonts kit, with Jost as the free fallback, Anton for board titles, and Space Mono for captions. Fonts load from Google Fonts and fall back to system fonts offline.
+- The board works on phones.
 - Some cards point to products that may need a paid plan, such as Claude Design and Figma Dev Mode MCP.
 - Each card shows when its link was last checked.
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.1.0 (2026-10-16)
+
+- 90s floppy disk redesign: each card is a disk with a shutter, paper label, and holographic link strip
+- New palette from 90s product mockups: charcoal sheet in an indigo frame, with orchid, periwinkle, coral, holo mint, and holo pink tracks
+- New type: Futura PT with Jost as the fallback, Anton for board titles, and Space Mono for captions
+- State on the disk: a lit shutter for In progress, a stamp for Done, and a ripped label for Did not finish
+- Boards show six disks, then scroll with a range counter
+- Dark only
+
 ## v1.0.0 (2026-10-16)
 
 First public release.
