@@ -1,0 +1,31 @@
+name: Report a resource
+description: Flag a card that's broken, archived, unavailable, or not useful.
+title: "Report: "
+labels: ["resource-report"]
+body:
+  - type: input
+    id: card
+    attributes:
+      label: Card title
+      description: Copy the title from the board.
+    validations:
+      required: true
+  - type: dropdown
+    id: reason
+    attributes:
+      label: What's wrong
+      options:
+        - Link is broken
+        - Archived
+        - Unavailable
+        - Not useful
+        - Out of date
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: What you saw, and a replacement link if you know one.
+    validations:
+      required: false

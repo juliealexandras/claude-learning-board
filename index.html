@@ -94,6 +94,7 @@ textarea{min-height:64px;resize:vertical}
 .readme p,.readme ul{margin:0;font-size:14px;max-width:62ch}
 .readme ul{padding-left:18px;display:flex;flex-direction:column;gap:4px}
 .readme .tk{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:6px;vertical-align:1px}
+.notice{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;font-size:14px;background:var(--accent-soft);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -140,16 +141,21 @@ textarea{min-height:64px;resize:vertical}
         </ul>
       </div>
       <div>
-        <h3>Good to know</h3>
+        <h3>Your progress</h3>
         <ul>
-          <li>Progress saves in this browser only. Clearing site data or switching browsers or devices starts a fresh board.</li>
-          <li>The starting cards live in <code>cards.js</code>. Edit that file to change the plan, then select <b>Reset board</b> to load it.</li>
+          <li>Progress saves in this browser. Select <b>Export progress</b> to back it up or move it, and <b>Import progress</b> to load it in another browser.</li>
+          <li>When the plan in <code>cards.js</code> changes, for example after a <code>git pull</code>, new cards appear automatically. Your progress and notes stay.</li>
+          <li><b>Reset board</b> clears all progress and notes and reloads the plan.</li>
           <li>Ask Claude to review your board anytime for a suggestion on what to do next.</li>
         </ul>
-        <div class="actions" id="resetRow" style="margin-top:12px"></div>
+        <div class="actions" id="dataRow" style="margin-top:12px"></div>
+        <label class="sr" for="importFile">Import progress file</label>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
       </div>
     </div>
   </details>
+
+  <div class="notice" id="notice" role="status" hidden><span id="noticeText"></span><button class="btn ghost" data-dismiss="1">Dismiss</button></div>
 
   <div class="filters" id="filters" role="group" aria-label="Filter by track"></div>
 
@@ -174,7 +180,7 @@ const COLS = [
   {id:"done",  label:"Done"},
   {id:"dnf",   label:"Did not finish"},
 ];
-let cards = [], confirmReset = false, filter = "all", openId = null, dnfAsk = null, addingIn = null, confirmDel = null, canWrite = true;
+let cards = [], removed = [], pendingImport = null, confirmReset = false, filter = "all", openId = null, dnfAsk = null, addingIn = null, confirmDel = null, canWrite = true;
 let filterSaved; try { filterSaved = localStorage.getItem("lb-filter"); } catch(e) {}
 if (filterSaved && (filterSaved === "all" || TRACKS[filterSaved])) filter = filterSaved;
 
@@ -184,6 +190,7 @@ const $ = s => document.querySelector(s);
   r.addEventListener("toggle", () => { try { localStorage.setItem("lb-readme", r.open ? "open" : "closed"); } catch(e) {} });
 })();
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtDate = d => { const t = new Date(d + "T00:00:00Z"); return isNaN(t) ? esc(d) : t.toLocaleDateString("en-US", {month:"short", year:"numeric", timeZone:"UTC"}); };
 // Inline `code` support in detail text
 const fmt = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
 
@@ -227,7 +234,7 @@ function cardHTML(c){
     </div>`;
   }
   return `<article class="card" draggable="${canWrite}" data-id="${c.id}" data-status="${c.status}" style="--c:${t.c}">
-    <div class="top"><span class="tag">${esc(t.label)}</span>${c.status==="dnf" && c.dnfReason ? `<span class="dnf-reason">${esc(c.dnfReason)}</span>` : (c.est?`<span class="meta">${esc(c.est)}</span>`:"")}</div>
+    <div class="top"><span class="tag">${esc(t.label)}</span>${c.status==="dnf" && c.dnfReason ? `<span class="dnf-reason">${esc(c.dnfReason)}</span>` : (c.lastChecked ? `<span class="meta" title="Link last checked">Checked ${fmtDate(c.lastChecked)}</span>` : "")}</div>
     <h3>${esc(c.title)}</h3>
     ${c.detail ? `<div class="meta">${fmt(c.detail)}</div>` : ""}
     ${c.url ? `<div class="meta"><a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.urlLabel || "Open resource")} ↗</a></div>` : ""}
@@ -277,20 +284,67 @@ function render(){
 
 const maxOrder = status => Math.max(0, ...cards.filter(c => c.status === status).map(c => c.order ?? 0));
 
-const STORE = "claude-learning-board-v1";
+const STORE = "claude-learning-board-v2", LEGACY = "claude-learning-board-v1";
+const PROGRESS_FIELDS = ["status", "order", "note", "dnfReason", "updatedAt"];
 const seed = () => JSON.parse(JSON.stringify(window.LEARNING_CARDS || []));
+const planIds = () => new Set(seed().map(c => c.id));
+
+// Combine saved progress with the latest plan in cards.js.
+// Plan cards take their text and links from cards.js and their progress from the save.
+// New plan cards are added unless this person removed them. Cards the person added, and
+// plan cards later dropped from cards.js, are kept so no notes are lost.
+// Returns how many new plan cards were added.
+function merge(saved, savedRemoved){
+  removed = Array.isArray(savedRemoved) ? savedRemoved.filter(x => typeof x === "string") : [];
+  const byId = new Map(saved.filter(c => c && typeof c.id === "string").map(c => [c.id, c]));
+  const out = []; let added = 0;
+  for (const p of seed()){
+    const s = byId.get(p.id);
+    if (s && !s.custom){
+      const m = {...p}; for (const f of PROGRESS_FIELDS) if (s[f] !== undefined) m[f] = s[f];
+      out.push(m); byId.delete(p.id);
+    } else if (!s && !removed.includes(p.id)){ out.push(p); added++; }
+  }
+  for (const s of byId.values()) out.push({...s, custom: true});
+  cards = out; return added;
+}
 function load(){
-  try { const saved = JSON.parse(localStorage.getItem(STORE)); if (Array.isArray(saved)) return saved; } catch(e) {}
-  return seed();
+  let data = null;
+  try { data = JSON.parse(localStorage.getItem(STORE)); } catch(e) {}
+  if (!data){ try { const old = JSON.parse(localStorage.getItem(LEGACY)); if (Array.isArray(old)) data = {cards: old}; } catch(e) {} }
+  if (!data || !Array.isArray(data.cards)){ cards = seed(); removed = []; save(); return 0; }
+  const added = merge(data.cards, data.removed); save(); return added;
 }
 function save(){
-  try { localStorage.setItem(STORE, JSON.stringify(cards)); }
-  catch(e) { showStatus("Your browser blocked saving, so changes will be lost when you close this tab."); }
+  try { localStorage.setItem(STORE, JSON.stringify({version: 2, cards, removed})); }
+  catch(e) { showStatus("Your browser blocked saving, so changes will be lost when you close this tab. Use Export progress to keep a copy."); }
 }
-function renderReset(){
-  $("#resetRow").innerHTML = confirmReset
-    ? '<span class="meta">Clear all progress and notes, and reload the cards from cards.js?</span><button class="btn danger" data-reset="yes">Reset board</button><button class="btn ghost" data-reset="no">Cancel</button>'
-    : '<button class="btn" data-reset="ask">Reset board</button>';
+function exportData(){
+  const payload = {app: "claude-learning-board", version: 2, exportedAt: new Date().toISOString(), cards, removed};
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type: "application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `claude-learning-board-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  notify("Progress exported. Import the file in any browser to pick up where you left off.");
+}
+// Returns an error message, or null on success.
+function importData(text){
+  let d; try { d = JSON.parse(text); } catch(e) { return "That file isn't valid JSON. Choose a file exported from this board."; }
+  const list = Array.isArray(d) ? d : d && d.cards;
+  if (!Array.isArray(list) || !list.length || !list.every(c => c && typeof c.id === "string" && typeof c.title === "string"))
+    return "That file doesn't look like a board export. Choose a file exported from this board.";
+  merge(list, d.removed); openId = null; save(); render();
+  return null;
+}
+function notify(msg){ $("#noticeText").textContent = msg; $("#notice").hidden = false; }
+function renderData(){
+  let h;
+  if (pendingImport) h = `<span class="meta">Replace this board with the progress in ${esc(pendingImport.name)}?</span><button class="btn danger" data-importgo="1">Replace board</button><button class="btn ghost" data-importcancel="1">Cancel</button>`;
+  else if (confirmReset) h = '<span class="meta">Clear all progress and notes, and reload the plan from cards.js?</span><button class="btn danger" data-reset="yes">Reset board</button><button class="btn ghost" data-reset="no">Cancel</button>';
+  else h = '<button class="btn" data-export="1">Export progress</button><button class="btn" data-import="1">Import progress</button><button class="btn ghost" data-reset="ask">Reset board</button>';
+  $("#dataRow").innerHTML = h;
 }
 function showStatus(msg){ const s = $("#status"); s.textContent = msg; s.hidden = false; }
 
@@ -305,9 +359,17 @@ document.addEventListener("click", async e => {
   if (b.dataset.reset){
     if (b.dataset.reset === "ask") confirmReset = true;
     else if (b.dataset.reset === "no") confirmReset = false;
-    else { confirmReset = false; openId = null; cards = seed(); save(); render(); }
-    renderReset(); return;
+    else { confirmReset = false; openId = null; cards = seed(); removed = []; save(); render(); notify("Board reset to the plan in cards.js."); }
+    renderData(); return;
   }
+  if (b.dataset.export){ exportData(); return; }
+  if (b.dataset.import){ $("#importFile").click(); return; }
+  if (b.dataset.importcancel){ pendingImport = null; renderData(); return; }
+  if (b.dataset.importgo){
+    const err = importData(pendingImport.text); pendingImport = null; renderData();
+    notify(err || "Progress imported."); return;
+  }
+  if (b.dataset.dismiss){ $("#notice").hidden = true; return; }
   if (b.dataset.f){ filter = b.dataset.f; try{localStorage.setItem("lb-filter", filter);}catch(_){} render(); return; }
   if (b.dataset.dnfask){ dnfAsk = b.dataset.dnfask; render(); return; }
   if (b.dataset.dnfcancel){ dnfAsk = null; render(); return; }
@@ -326,7 +388,7 @@ document.addEventListener("click", async e => {
   }
   if (b.dataset.askdel){ confirmDel = b.dataset.askdel; render(); return; }
   if (b.dataset.canceldel){ confirmDel = null; render(); return; }
-  if (b.dataset.del){ const id = b.dataset.del; confirmDel = null; openId = null; cards = cards.filter(x => x.id !== id); save(); render(); return; }
+  if (b.dataset.del){ const id = b.dataset.del; confirmDel = null; openId = null; if (planIds().has(id) && !removed.includes(id)) removed.push(id); cards = cards.filter(x => x.id !== id); save(); render(); return; }
   if (b.dataset.add){ addingIn = b.dataset.add; render(); return; }
   if (b.dataset.canceladd){ addingIn = null; render(); return; }
 });
@@ -338,7 +400,7 @@ document.addEventListener("submit", async e => {
   const title = String(fd.get("title")||"").trim(); if (!title) return;
   const data = {title, track: fd.get("track"), status, order: maxOrder(status)+1, url: String(fd.get("url")||"").trim(), detail: String(fd.get("detail")||"").trim(), note:"", createdAt: new Date().toISOString()};
   addingIn = null;
-  cards.push({id: "c" + Date.now().toString(36), ...data}); save(); render();
+  cards.push({id: "c" + Date.now().toString(36), custom: true, ...data}); save(); render();
 });
 
 // Drag and drop between columns (desktop)
@@ -348,9 +410,16 @@ document.addEventListener("dragend", e => { document.querySelectorAll(".dragging
 document.addEventListener("dragover", e => { const col = e.target.closest(".col"); if (!col || !dragId) return; e.preventDefault(); document.querySelectorAll(".col.over").forEach(n => n !== col && n.classList.remove("over")); col.classList.add("over"); });
 document.addEventListener("drop", e => { const col = e.target.closest(".col"); if (!col || !dragId) return; e.preventDefault(); col.classList.remove("over"); moveTo(dragId, col.dataset.col); });
 
-cards = load();
-renderReset();
+document.getElementById("importFile").addEventListener("change", async e => {
+  const f = e.target.files && e.target.files[0]; e.target.value = "";
+  if (!f) return;
+  pendingImport = {name: f.name, text: await f.text()}; confirmReset = false; renderData();
+});
+const firstRun = (() => { try { return !localStorage.getItem(STORE) && !localStorage.getItem(LEGACY); } catch(e) { return true; } })();
+const addedOnLoad = load();
+renderData();
 render();
+if (!firstRun && addedOnLoad) notify(`${addedOnLoad} new card${addedOnLoad === 1 ? "" : "s"} added from the latest plan. Your progress and notes are unchanged.`);
 </script>
 </body>
 </html>

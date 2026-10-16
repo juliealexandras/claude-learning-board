@@ -1,6 +1,17 @@
 # Claude Learning Board
 
-A kanban board for designers learning to work with Claude. It starts with 23 courses, experiments, and habits across five tracks:
+A kanban board for designers learning to work with Claude. It starts with 23 courses, experiments, and habits across five tracks, and it opens in any browser with no install and no build step.
+
+**[Try the live board](https://YOUR-USERNAME.github.io/claude-learning-board/)**
+
+<!-- Screenshot: add docs/board-light.png and docs/board-dark.png, then uncomment.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/board-dark.png">
+  <img alt="The Claude Learning Board with cards in Up next, In progress, Done, and Did not finish columns" src="docs/board-light.png">
+</picture>
+-->
+
+## Tracks
 
 - **Claude Academy:** free official courses and Anthropic's prompting guides
 - **Claude Design:** prototypes, explorations, and design system use
@@ -8,42 +19,37 @@ A kanban board for designers learning to work with Claude. It starts with 23 cou
 - **Habits:** everyday practices that improve results
 - **Misc:** extra references and suggestions you add, such as an article, video, tool, or template
 
-It runs in any browser with no install and no build step. Progress saves in your browser.
+Cards move through **Up next**, **In progress**, and **Done**. Cards that weren't useful, or whose tools are archived or unavailable, go to **Did not finish** and don't count toward progress.
 
-Created by Julie Spigner, [Julie Alexandra Studio](https://juliealexandrastudio.com).
+## 1. Get your own copy
 
----
+### Option A: Use this template (recommended)
 
-## 1. Get the repo
+1. Select **Use this template** at the top of this page, then **Create a new repository**.
+2. Name it and select **Create repository**.
 
-### Option A: Terminal
+You get your own repo with a clean history that you can edit, publish, and update freely.
+
+### Option B: Clone
 
 ```bash
 git clone https://github.com/YOUR-USERNAME/claude-learning-board.git
 cd claude-learning-board
 ```
 
-### Option B: GitHub Desktop
+Cloning makes it easy to pull new cards later with `git pull`. With GitHub Desktop, select **Code**, then **Open with GitHub Desktop**.
 
-1. Open the repo page on GitHub.
-2. Select **Code**, then **Open with GitHub Desktop**.
-3. Choose where to save it and select **Clone**.
+### Option C: Download
 
-### Option C: No Git
-
-1. Open the repo page on GitHub.
-2. Select **Code**, then **Download ZIP**.
-3. Unzip the folder.
+Select **Code**, then **Download ZIP**, and unzip the folder.
 
 ## 2. Open the board
 
 Double-click `index.html`. It opens in your browser and is ready to use.
 
-To share it as a link instead, turn on GitHub Pages: in the repo, go to **Settings > Pages**, set the source to the `main` branch, and save. Each person who opens the link gets their own progress.
+To get a link you can open anywhere, turn on GitHub Pages in your copy: go to **Settings > Pages**, set the source to the `main` branch and `/ (root)` folder, and save. Each person who opens the link gets their own progress.
 
 ## 3. Bring it into your Claude space
-
-Pick the setup that matches how you use Claude.
 
 ### Claude desktop app (recommended)
 
@@ -53,7 +59,7 @@ Pick the setup that matches how you use Claude.
 
    > Read the CLAUDE.md in this folder. Then publish index.html and cards.js as an artifact that saves my progress in claude.ai.
 
-Claude turns it into a board that lives in your claude.ai artifacts, syncs across your devices, and that Claude can read later to suggest what to do next.
+Claude turns it into a board in your claude.ai artifacts that syncs across your devices and that Claude can read later to suggest what to do next.
 
 ### claude.ai on the web
 
@@ -70,17 +76,29 @@ claude
 
 Then ask Claude to update the plan, for example:
 
-> Add a card to the Claude Design track for testing a prototype with five users.
+> Add a card to the Misc track for testing a prototype with five users.
 
-Claude Code reads `CLAUDE.md` automatically and edits `cards.js` for you.
+Claude Code reads `CLAUDE.md` automatically, edits `cards.js`, and runs the validator.
 
-## 4. Make it yours
+## 4. Your progress
 
-- **Change the plan:** edit `cards.js`, then open the board's Read me and select **Reset board** to load your changes. Reset clears your progress and notes.
-- **Add a card from the board:** select **+ Add card** in any column. New cards default to the Misc track and include an optional "Why it's useful" field, so suggesting a link takes a few seconds.
-- **Suggest a reference for everyone:** add a card to `cards.js` with `track: "misc"` and open a pull request.
-- **Take notes:** open **Notes** on any card. Notes save with your progress.
-- **Set a card aside:** select **DNF** (did not finish) when a card wasn't useful or its tool is archived or unavailable, and pick a reason. DNF cards move to their own column, don't count toward progress, and can be restored anytime.
+- **Saving:** progress and notes save in your browser automatically.
+- **Backing up or switching browsers:** open the board's Read me and select **Export progress** to save a file. Select **Import progress** in another browser to load it.
+- **Getting new cards:** when `cards.js` changes, for example after `git pull`, new cards appear on your board automatically. Your progress and notes stay, and cards you removed stay removed.
+- **Starting over:** **Reset board** clears all progress and notes and reloads the plan.
+
+## 5. Make it yours
+
+- **Change the plan:** edit `cards.js`, then run `node scripts/validate-cards.mjs` to check it. Reload the board to see new cards.
+- **Add a card from the board:** select **+ Add card** in any column. New cards default to Misc and include an optional "Why it's useful" field.
+- **Take notes:** open **Notes** on any card.
+- **Set a card aside:** select **DNF** (did not finish) and pick a reason. Restore it anytime.
+
+## Contributing
+
+Suggest a resource or report a broken one with the issue forms, or open a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+A weekly GitHub Action checks every link and opens an issue when one breaks. Another validates `cards.js` on every pull request.
 
 ## What's in the repo
 
@@ -89,9 +107,19 @@ Claude Code reads `CLAUDE.md` automatically and edits `cards.js` for you.
 | `index.html` | The board: layout, styles, and logic |
 | `cards.js` | The starting list of cards |
 | `CLAUDE.md` | Instructions Claude reads when working in this folder |
+| `CONTRIBUTING.md` | How to suggest, report, and add cards |
+| `scripts/validate-cards.mjs` | Checks `cards.js` for mistakes, with no dependencies |
+| `.github/` | Issue forms, pull request template, and the two Actions |
+| `docs/MAINTAINER-SETUP.md` | One-time GitHub settings for the repo owner |
 
 ## Good to know
 
-- In the browser version, progress lives in that browser only. Clearing site data or switching browsers starts fresh.
-- The board supports light and dark mode and works on phones.
-- Some links point to Anthropic and Figma products that may need a paid plan, such as Claude Design and Figma Dev Mode MCP.
+- The board supports light and dark mode, works on phones, and has no dependencies beyond Google Fonts. It falls back to system fonts offline.
+- Some cards point to products that may need a paid plan, such as Claude Design and Figma Dev Mode MCP.
+- Each card shows when its link was last checked.
+
+## License
+
+Code is MIT licensed. The card list in `cards.js` is licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). See [LICENSE](LICENSE).
+
+Created by Julie Spigner, [Julie Alexandra Studio](https://juliealexandrastudio.com).

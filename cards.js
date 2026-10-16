@@ -1,3 +1,6 @@
+// Claude Learning Board card list by Julie Spigner, Julie Alexandra Studio.
+// Licensed CC BY 4.0: https://creativecommons.org/licenses/by/4.0/
+//
 // Starting cards for the board. Edit this list to change the plan,
 // then select "Reset board" in the page's Read me to load your changes.
 //
@@ -9,37 +12,41 @@
 //   order     position within a column (lower comes first)
 //   detail    optional one-line description; wrap commands in `backticks`
 //   url       optional link; urlLabel is the link text
+//   lastChecked  date the link was last confirmed working, YYYY-MM-DD
+//
+// Why a .js file and not JSON: the board loads this with a script tag, so index.html
+// opens by double-click with no local server. Browsers block fetching JSON from file://.
 window.LEARNING_CARDS = [
   // Claude Academy
   { id: "a01", title: "Claude 101", track: "academy", status: "todo", order: 1,
     detail: "Core features and everyday collaboration habits.",
-    url: "https://academy.claude.com", urlLabel: "Claude Academy" },
+    url: "https://academy.claude.com", urlLabel: "Claude Academy", lastChecked: "2026-10-16" },
   { id: "a02", title: "AI Fluency: Framework & Foundations", track: "academy", status: "todo", order: 2,
     detail: "How to delegate, describe, and evaluate work with AI.",
-    url: "https://academy.claude.com", urlLabel: "Claude Academy" },
+    url: "https://academy.claude.com", urlLabel: "Claude Academy", lastChecked: "2026-10-16" },
   { id: "a03", title: "Claude Code 101", track: "academy", status: "todo", order: 3,
     detail: "Your design engineering on-ramp.",
-    url: "https://academy.claude.com", urlLabel: "Claude Academy" },
+    url: "https://academy.claude.com", urlLabel: "Claude Academy", lastChecked: "2026-10-16" },
   { id: "a04", title: "Claude Code in Action", track: "academy", status: "todo", order: 4,
     detail: "Hands-on coding workflows with Claude Code.",
-    url: "https://academy.claude.com", urlLabel: "Claude Academy" },
+    url: "https://academy.claude.com", urlLabel: "Claude Academy", lastChecked: "2026-10-16" },
   { id: "a05", title: "Introduction to Agent Skills", track: "academy", status: "todo", order: 5,
     detail: "Package repeatable studio workflows as skills.",
-    url: "https://academy.claude.com", urlLabel: "Claude Academy" },
+    url: "https://academy.claude.com", urlLabel: "Claude Academy", lastChecked: "2026-10-16" },
   { id: "a06", title: "Prompt engineering interactive tutorial", track: "academy", status: "todo", order: 6,
     detail: "Hands-on notebooks, including real world prompting.",
-    url: "https://github.com/anthropics/courses", urlLabel: "anthropics/courses on GitHub" },
+    url: "https://github.com/anthropics/courses", urlLabel: "anthropics/courses on GitHub", lastChecked: "2026-10-16" },
   { id: "a07", title: "Read the prompt engineering guide", track: "academy", status: "todo", order: 7,
     detail: "Anthropic's written reference for clear, structured prompts.",
-    url: "https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview", urlLabel: "Claude docs" },
+    url: "https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview", urlLabel: "Claude docs", lastChecked: "2026-10-16" },
 
   // Claude Design
   { id: "d01", title: "Turn a static mockup into an interactive prototype", track: "design", status: "todo", order: 8,
     detail: "Pick a real screen and make it shareable for feedback.",
-    url: "https://claude.ai/design", urlLabel: "Claude Design" },
+    url: "https://claude.ai/design", urlLabel: "Claude Design", lastChecked: "2026-10-16" },
   { id: "d02", title: "Explore five directions for one project", track: "design", status: "todo", order: 9,
     detail: "Use Claude Design to widen exploration before narrowing.",
-    url: "https://claude.ai/design", urlLabel: "Claude Design" },
+    url: "https://claude.ai/design", urlLabel: "Claude Design", lastChecked: "2026-10-16" },
   { id: "d03", title: "Load a design system into Claude Design", track: "design", status: "todo", order: 10,
     detail: "So colors, type, and components apply automatically." },
   { id: "d04", title: "Ask for an accessibility and hierarchy review", track: "design", status: "todo", order: 11,
@@ -59,7 +66,7 @@ window.LEARNING_CARDS = [
   { id: "f05", title: "Build a component from a Figma frame link", track: "figma", status: "todo", order: 17,
     detail: "Try it with a component from your own design system or wireframe kit." },
   { id: "f06", title: "Read Figma's skills for MCP guide", track: "figma", status: "todo", order: 18,
-    url: "https://help.figma.com/hc/en-us/articles/39166810751895-Figma-skills-for-MCP", urlLabel: "Figma Help Center" },
+    url: "https://help.figma.com/hc/en-us/articles/39166810751895-Figma-skills-for-MCP", urlLabel: "Figma Help Center", lastChecked: "2026-10-16" },
 
   // Habits
   { id: "h01", title: "Set up a Project per client", track: "habits", status: "todo", order: 19,

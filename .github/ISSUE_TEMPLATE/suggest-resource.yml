@@ -1,0 +1,53 @@
+name: Suggest a resource
+description: Recommend a course, article, video, tool, or template for the board.
+title: "Suggest: "
+labels: ["suggestion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a resource. Accepted suggestions are added to `cards.js` and appear for everyone on their next update.
+  - type: input
+    id: title
+    attributes:
+      label: Card title
+      description: What someone should learn or try, in a few words.
+      placeholder: Test a Claude Design prototype with five users
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Link
+      placeholder: https://
+    validations:
+      required: false
+  - type: dropdown
+    id: track
+    attributes:
+      label: Track
+      options:
+        - Misc
+        - Claude Academy
+        - Claude Design
+        - Code + Figma
+        - Habits
+      default: 0
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it's useful
+      description: One or two sentences on who it helps and what they'll get from it.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you submit
+      options:
+        - label: The link works and doesn't require a paid plan, or I've noted the plan it needs above.
+          required: false
+        - label: I checked the board and this resource isn't already on it.
+          required: true

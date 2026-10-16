@@ -1,0 +1,4 @@
+# Links that need a signed-in account and can't be checked automatically.
+^https://claude\.ai/
+# Placeholder in the README clone command.
+YOUR-USERNAME
