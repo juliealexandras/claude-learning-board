@@ -80,6 +80,7 @@ Claude Code reads `CLAUDE.md` automatically and edits `cards.js` for you.
 - **Add a card from the board:** select **+ Add card** in any column. New cards default to the Misc track and include an optional "Why it's useful" field, so suggesting a link takes a few seconds.
 - **Suggest a reference for everyone:** add a card to `cards.js` with `track: "misc"` and open a pull request.
 - **Take notes:** open **Notes** on any card. Notes save with your progress.
+- **Set a card aside:** select **DNF** (did not finish) when a card wasn't useful or its tool is archived or unavailable, and pick a reason. DNF cards move to their own column, don't count toward progress, and can be restored anytime.
 
 ## What's in the repo
 

@@ -5,7 +5,7 @@
 //   id        unique text id
 //   title     what to learn or try
 //   track     academy | design | figma | habits | misc
-//   status    todo | doing | done
+//   status    todo | doing | done | dnf (did not finish)
 //   order     position within a column (lower comes first)
 //   detail    optional one-line description; wrap commands in `backticks`
 //   url       optional link; urlLabel is the link text

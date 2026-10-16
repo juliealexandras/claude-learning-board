@@ -45,8 +45,13 @@ h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4vw,40px);lin
 .chip i{width:8px;height:8px;border-radius:50%;background:var(--c,var(--muted))}
 .chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--on-ink)}
 .chip .n{font-family:var(--mono);font-size:11px;opacity:.75}
-.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
-@media (max-width:860px){.board{grid-template-columns:1fr}}
+.board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;align-items:start}
+@media (max-width:1100px){.board{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.board{grid-template-columns:1fr}}
+.col[data-col="dnf"]{border-style:dotted;background:transparent}
+.card[data-status="dnf"]{border-left-color:var(--line);cursor:default}
+.card[data-status="dnf"] h3,.card[data-status="dnf"] .tag{color:var(--muted)}
+.dnf-reason{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 8px;white-space:nowrap}
 .col{background:color-mix(in srgb,var(--sheet) 70%,transparent);border:1px dashed var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:140px}
 .col.over{border-color:var(--accent);background:var(--accent-soft)}
 .col h2{font-family:var(--display);font-weight:500;font-size:18px;margin:0;display:flex;justify-content:space-between;align-items:baseline}
@@ -101,7 +106,7 @@ textarea{min-height:64px;resize:vertical}
       <h1>Working better with Claude</h1>
     </div>
     <div class="progress" aria-live="polite">
-      <div class="nums"><span><b id="doneN">0</b> of <b id="totalN">0</b> done</span><span id="pct">0%</span></div>
+      <div class="nums"><span><b id="doneN">0</b> of <b id="totalN">0</b> done<span id="dnfNote"></span></span><span id="pct">0%</span></div>
       <div class="bar"><span id="barFill"></span></div>
     </div>
   </header>
@@ -121,6 +126,7 @@ textarea{min-height:64px;resize:vertical}
           <li>Use <b>+ Add card</b> in any column to add your own item. New cards default to <b>Misc</b>, so it's a quick way to suggest a useful link.</li>
           <li>Use the chips above the board to focus on one track.</li>
           <li>Remove a card from its Notes panel.</li>
+          <li>Select <b>DNF</b> (did not finish) when a card wasn't useful or its tool is archived or unavailable. DNF cards don't count toward progress, and you can restore them anytime.</li>
         </ul>
       </div>
       <div>
@@ -161,12 +167,14 @@ const TRACKS = {
   habits:  {label:"Habits",         c:"var(--t-habits)"},
   misc:    {label:"Misc",           c:"var(--t-misc)"},
 };
+const REASONS = ["Not useful", "Archived", "Unavailable"];
 const COLS = [
   {id:"todo",  label:"Up next"},
   {id:"doing", label:"In progress"},
   {id:"done",  label:"Done"},
+  {id:"dnf",   label:"Did not finish"},
 ];
-let cards = [], confirmReset = false, filter = "all", openId = null, addingIn = null, confirmDel = null, canWrite = true;
+let cards = [], confirmReset = false, filter = "all", openId = null, dnfAsk = null, addingIn = null, confirmDel = null, canWrite = true;
 let filterSaved; try { filterSaved = localStorage.getItem("lb-filter"); } catch(e) {}
 if (filterSaved && (filterSaved === "all" || TRACKS[filterSaved])) filter = filterSaved;
 
@@ -194,8 +202,15 @@ function cardHTML(c){
   const open = openId === c.id;
   let actions = "";
   if (canWrite) {
-    actions += idx > 0 ? `<button class="btn" data-move="-1" data-id="${c.id}" aria-label="Move back to ${COLS[idx-1].label}">← ${COLS[idx-1].label}</button>` : "";
-    actions += idx < 2 ? `<button class="btn primary" data-move="1" data-id="${c.id}" aria-label="Move to ${COLS[idx+1].label}">${COLS[idx+1].label} →</button>` : "";
+    if (c.status === "dnf") {
+      actions += `<button class="btn" data-restore="${c.id}">Restore to Up next</button>`;
+    } else {
+      actions += idx > 0 ? `<button class="btn" data-move="-1" data-id="${c.id}" aria-label="Move back to ${COLS[idx-1].label}">← ${COLS[idx-1].label}</button>` : "";
+      actions += idx < 2 ? `<button class="btn primary" data-move="1" data-id="${c.id}" aria-label="Move to ${COLS[idx+1].label}">${COLS[idx+1].label} →</button>` : "";
+      actions += dnfAsk === c.id
+        ? `<span class="meta">Why?</span>` + REASONS.map(r => `<button class="btn" data-dnf="${c.id}" data-reason="${r}">${r}</button>`).join("") + `<button class="btn ghost" data-dnfcancel="1">Cancel</button>`
+        : `<button class="btn ghost" data-dnfask="${c.id}" aria-label="Mark ${esc(c.title)} as did not finish">DNF</button>`;
+    }
   }
   actions += `<button class="btn ghost" data-open="${c.id}" aria-expanded="${open}">${open ? "Close notes" : (c.note ? "Notes ●" : "Notes")}</button>`;
   let notes = "";
@@ -212,7 +227,7 @@ function cardHTML(c){
     </div>`;
   }
   return `<article class="card" draggable="${canWrite}" data-id="${c.id}" data-status="${c.status}" style="--c:${t.c}">
-    <div class="top"><span class="tag">${esc(t.label)}</span>${c.est?`<span class="meta">${esc(c.est)}</span>`:""}</div>
+    <div class="top"><span class="tag">${esc(t.label)}</span>${c.status==="dnf" && c.dnfReason ? `<span class="dnf-reason">${esc(c.dnfReason)}</span>` : (c.est?`<span class="meta">${esc(c.est)}</span>`:"")}</div>
     <h3>${esc(c.title)}</h3>
     ${c.detail ? `<div class="meta">${fmt(c.detail)}</div>` : ""}
     ${c.url ? `<div class="meta"><a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.urlLabel || "Open resource")} ↗</a></div>` : ""}
@@ -241,7 +256,9 @@ function render(){
   $("#board").hidden = false;
   if (cards.length) $("#status").hidden = true;
   else showStatus("Your board is empty. Use “+ Add card” in any column, or select Reset board in the Read me.");
-  const total = cards.length, done = cards.filter(c => c.status === "done").length;
+  const dnfN = cards.filter(c => c.status === "dnf").length;
+  const total = cards.length - dnfN, done = cards.filter(c => c.status === "done").length;
+  $("#dnfNote").textContent = dnfN ? ` · ${dnfN} DNF` : "";
   $("#doneN").textContent = done; $("#totalN").textContent = total;
   const pct = total ? Math.round(done/total*100) : 0;
   $("#pct").textContent = pct + "%"; $("#barFill").style.width = pct + "%";
@@ -251,7 +268,7 @@ function render(){
     const list = visible.filter(c => c.status === col.id).sort((a,b) => (a.order??0) - (b.order??0));
     return `<section class="col" data-col="${col.id}" aria-label="${col.label}">
       <h2>${col.label} <span class="count">${list.length}</span></h2>
-      <div class="list">${list.map(cardHTML).join("") || `<div class="empty">${col.id==="done" ? "Finished items land here." : col.id==="doing" ? "Move a card here when you start it." : "Nothing queued."}</div>`}</div>
+      <div class="list">${list.map(cardHTML).join("") || `<div class="empty">${col.id==="dnf" ? "Cards that weren't useful, or tools that are archived or unavailable." : col.id==="done" ? "Finished items land here." : col.id==="doing" ? "Move a card here when you start it." : "Nothing queued."}</div>`}</div>
       ${canWrite ? (addingIn === col.id ? addFormHTML(col.id) : `<button class="btn ghost" data-add="${col.id}">+ Add card</button>`) : ""}
     </section>`;
   }).join("");
@@ -277,10 +294,10 @@ function renderReset(){
 }
 function showStatus(msg){ const s = $("#status"); s.textContent = msg; s.hidden = false; }
 
-async function moveTo(id, status){
+async function moveTo(id, status, reason){
   const c = cards.find(x => x.id === id); if (!c || c.status === status) return;
   const order = maxOrder(status) + 1;
-  Object.assign(c, {status, order, updatedAt: new Date().toISOString()}); save(); render();
+  Object.assign(c, {status, order, dnfReason: status === "dnf" ? (reason || c.dnfReason || "") : "", updatedAt: new Date().toISOString()}); save(); render();
 }
 
 document.addEventListener("click", async e => {
@@ -292,6 +309,10 @@ document.addEventListener("click", async e => {
     renderReset(); return;
   }
   if (b.dataset.f){ filter = b.dataset.f; try{localStorage.setItem("lb-filter", filter);}catch(_){} render(); return; }
+  if (b.dataset.dnfask){ dnfAsk = b.dataset.dnfask; render(); return; }
+  if (b.dataset.dnfcancel){ dnfAsk = null; render(); return; }
+  if (b.dataset.dnf){ const id = b.dataset.dnf; dnfAsk = null; moveTo(id, "dnf", b.dataset.reason); return; }
+  if (b.dataset.restore){ moveTo(b.dataset.restore, "todo"); return; }
   if (b.dataset.move){
     const c = cards.find(x => x.id === b.dataset.id);
     const idx = COLS.findIndex(x => x.id === c.status) + Number(b.dataset.move);
