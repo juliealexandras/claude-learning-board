@@ -2,9 +2,9 @@
 
 One-time GitHub settings for the repo owner. Do these after the first push.
 
-## 1. Replace the placeholder username
+## 1. Check the username
 
-Replace `YOUR-USERNAME` in `README.md` with your GitHub username, in both the live board link and the clone command.
+The README links use the `juliealexandras` account. If you fork or move the repo, update the live board link and clone command in `README.md`.
 
 ## 2. Make it a template
 
@@ -12,7 +12,7 @@ Replace `YOUR-USERNAME` in `README.md` with your GitHub username, in both the li
 
 ## 3. Publish the live board
 
-**Settings > Pages**. Under **Build and deployment**, set **Source** to **Deploy from a branch**, choose `main` and `/ (root)`, and select **Save**. The board goes live at `https://YOUR-USERNAME.github.io/claude-learning-board/` within a few minutes.
+**Settings > Pages**. Under **Build and deployment**, set **Source** to **Deploy from a branch**, choose `main` and `/ (root)`, and select **Save**. The board goes live at `https://juliealexandras.github.io/claude-learning-board/` within a few minutes.
 
 ## 4. Fill in the About panel
 

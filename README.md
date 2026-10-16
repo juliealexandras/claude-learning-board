@@ -2,7 +2,7 @@
 
 A kanban board for designers learning to work with Claude. It starts with 23 courses, experiments, and habits across five tracks, and it opens in any browser with no install and no build step.
 
-**[Try the live board](https://YOUR-USERNAME.github.io/claude-learning-board/)**
+**[Try the live board](https://juliealexandras.github.io/claude-learning-board/)**
 
 <!-- Screenshot: add docs/board-light.png and docs/board-dark.png, then uncomment.
 <picture>
@@ -33,7 +33,7 @@ You get your own repo with a clean history that you can edit, publish, and updat
 ### Option B: Clone
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/claude-learning-board.git
+git clone https://github.com/juliealexandras/claude-learning-board.git
 cd claude-learning-board
 ```
 
