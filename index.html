@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Claude Learning Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a working wireframe sheet. Header with progress, track filters, three swim columns on a faint grid. */
+:root{
+  --paper:#F5F6F9; --sheet:#FFFFFF; --ink:#1A1F2C; --muted:#5D6578; --line:#DDE1EA; --grid:#E8EBF2;
+  --accent:#2F44D6; --accent-soft:#E7EAFD; --done:#1E7F5C;
+  --t-academy:#6A3FD1; --t-design:#C2410C; --t-figma:#0F7C86; --t-habits:#9A6B00;
+  --display:"Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
+  --body:"Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#12151D; --sheet:#1A1E28; --ink:#E8EAF1; --muted:#9AA2B5; --line:#2C3242; --grid:#1B1F2A;
+  --accent:#8C9BFF; --accent-soft:#252B4A; --done:#5FD3A4;
+  --t-academy:#B79BFF; --t-design:#FF9B6A; --t-figma:#5ED3DD; --t-habits:#E8C15A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#12151D; --sheet:#1A1E28; --ink:#E8EAF1; --muted:#9AA2B5; --line:#2C3242; --grid:#1B1F2A;
+  --accent:#8C9BFF; --accent-soft:#252B4A; --done:#5FD3A4;
+  --t-academy:#B79BFF; --t-design:#FF9B6A; --t-figma:#5ED3DD; --t-habits:#E8C15A; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;}
+.wrap{max-width:1240px;margin:0 auto;padding-block:28px 48px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
+  display:flex;flex-direction:column;gap:22px}
+header{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4vw,40px);line-height:1.05;margin:4px 0 0;text-wrap:balance}
+.progress{min-width:min(100%,300px);display:flex;flex-direction:column;gap:8px}
+.progress .nums{display:flex;justify-content:space-between;font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.progress .nums b{color:var(--ink);font-weight:500}
+.bar{height:10px;border:1px solid var(--line);background:var(--sheet);border-radius:2px;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--accent);width:0;transition:width .4s ease}
+.filters{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:500 13px var(--body);border:1px solid var(--line);background:var(--sheet);color:var(--ink);padding:6px 12px;border-radius:999px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.chip i{width:8px;height:8px;border-radius:50%;background:var(--c,var(--muted))}
+.chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--sheet)}
+.chip .n{font-family:var(--mono);font-size:11px;opacity:.75}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+@media (max-width:860px){.board{grid-template-columns:1fr}}
+.col{background:color-mix(in srgb,var(--sheet) 70%,transparent);border:1px dashed var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:140px}
+.col.over{border-color:var(--accent);background:var(--accent-soft)}
+.col h2{font-family:var(--display);font-weight:500;font-size:18px;margin:0;display:flex;justify-content:space-between;align-items:baseline}
+.col h2 .count{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.list{display:flex;flex-direction:column;gap:10px}
+.card{background:var(--sheet);border:1px solid var(--line);border-left:3px solid var(--c);border-radius:4px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;cursor:grab}
+.card.dragging{opacity:.45}
+.card .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--c)}
+.card h3{font:600 15px/1.35 var(--body);margin:0;min-width:0;overflow-wrap:anywhere}
+.card[data-status="done"] h3{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.card .meta{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.card a{color:var(--accent);text-underline-offset:2px}
+.card code{font-family:var(--mono);font-size:12px;background:var(--paper);padding:1px 4px;border-radius:3px}
+.actions{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.btn{font:500 12px var(--body);border:1px solid var(--line);background:transparent;color:var(--ink);padding:4px 9px;border-radius:4px;cursor:pointer}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--sheet)}
+.btn.ghost{border-color:transparent;color:var(--muted)}
+.btn.danger{color:#B42318;border-color:currentColor}
+button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+textarea,input,select{font:14px var(--body);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:6px 8px;width:100%}
+textarea{min-height:64px;resize:vertical}
+.notes{display:flex;flex-direction:column;gap:6px}
+.addform{display:flex;flex-direction:column;gap:8px;background:var(--sheet);border:1px solid var(--line);border-radius:4px;padding:10px}
+.addform .row{display:flex;gap:8px;flex-wrap:wrap}
+.addform .row > *{flex:1 1 140px}
+.empty{font-size:13px;color:var(--muted);padding:6px 2px}
+.status{font-size:14px;color:var(--muted);background:var(--sheet);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.readme{background:var(--sheet);border:1px solid var(--line);border-radius:6px}
+.readme summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 16px;font-family:var(--display);font-weight:500;font-size:18px}
+.readme summary::-webkit-details-marker{display:none}
+.readme summary .hint{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:400}
+.readme[open] summary .hint::after{content:"Hide"}
+.readme:not([open]) summary .hint::after{content:"Show"}
+.readme .body{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:20px 28px;padding:4px 16px 18px;border-top:1px dashed var(--line);padding-top:16px}
+.readme h3{font:600 13px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.readme p,.readme ul{margin:0;font-size:14px;max-width:62ch}
+.readme ul{padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.readme .tk{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:6px;vertical-align:1px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Designer learning sprint</div>
+      <h1>Working better with Claude</h1>
+    </div>
+    <div class="progress" aria-live="polite">
+      <div class="nums"><span><b id="doneN">0</b> of <b id="totalN">0</b> done</span><span id="pct">0%</span></div>
+      <div class="bar"><span id="barFill"></span></div>
+    </div>
+  </header>
+
+  <details class="readme" id="readme" open>
+    <summary>Read me <span class="hint"></span></summary>
+    <div class="body">
+      <div>
+        <h3>What this is</h3>
+        <p>A learning plan for working better with Claude as a designer, design engineer, and studio owner. Each card is one course, experiment, or habit. Cards start in a suggested order, top to bottom.</p>
+      </div>
+      <div>
+        <h3>How to use it</h3>
+        <ul>
+          <li>Drag a card to another column, or use the arrow buttons on any device.</li>
+          <li>Open <b>Notes</b> on a card to record what you learned and the prompts that worked. Select <b>Save notes</b> when you finish.</li>
+          <li>Use <b>+ Add card</b> in any column to add your own item.</li>
+          <li>Use the chips above the board to focus on one track.</li>
+          <li>Remove a card from its Notes panel.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>The four tracks</h3>
+        <ul>
+          <li><span class="tk" style="--c:var(--t-academy)"></span><b>Claude Academy:</b> free official courses and Anthropic's prompting guides.</li>
+          <li><span class="tk" style="--c:var(--t-design)"></span><b>Claude Design:</b> prototypes, explorations, and design system use.</li>
+          <li><span class="tk" style="--c:var(--t-figma)"></span><b>Code + Figma:</b> Claude Code with the Figma plugin, both directions.</li>
+          <li><span class="tk" style="--c:var(--t-habits)"></span><b>Habits:</b> everyday practices that improve results.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Good to know</h3>
+        <ul>
+          <li>Progress saves in this browser only. Clearing site data or switching browsers or devices starts a fresh board.</li>
+          <li>The starting cards live in <code>cards.js</code>. Edit that file to change the plan, then select <b>Reset board</b> to load it.</li>
+          <li>Ask Claude to review your board anytime for a suggestion on what to do next.</li>
+        </ul>
+        <div class="actions" id="resetRow" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </details>
+
+  <div class="filters" id="filters" role="group" aria-label="Filter by track"></div>
+
+  <div id="status" class="status">Loading your board.</div>
+
+  <div class="board" id="board" hidden></div>
+</div>
+
+<script src="cards.js"></script>
+<script>
+const TRACKS = {
+  academy: {label:"Claude Academy", c:"var(--t-academy)"},
+  design:  {label:"Claude Design",  c:"var(--t-design)"},
+  figma:   {label:"Code + Figma",   c:"var(--t-figma)"},
+  habits:  {label:"Habits",         c:"var(--t-habits)"},
+};
+const COLS = [
+  {id:"todo",  label:"Up next"},
+  {id:"doing", label:"In progress"},
+  {id:"done",  label:"Done"},
+];
+let cards = [], confirmReset = false, filter = "all", openId = null, addingIn = null, confirmDel = null, canWrite = true;
+let filterSaved; try { filterSaved = localStorage.getItem("lb-filter"); } catch(e) {}
+if (filterSaved && (filterSaved === "all" || TRACKS[filterSaved])) filter = filterSaved;
+
+const $ = s => document.querySelector(s);
+(() => { const r = document.getElementById("readme");
+  try { if (localStorage.getItem("lb-readme") === "closed") r.open = false; } catch(e) {}
+  r.addEventListener("toggle", () => { try { localStorage.setItem("lb-readme", r.open ? "open" : "closed"); } catch(e) {} });
+})();
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+// Inline `code` support in detail text
+const fmt = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+
+function renderFilters(){
+  const counts = {all: cards.length};
+  for (const k in TRACKS) counts[k] = cards.filter(c => c.track === k).length;
+  const opts = [["all","All tracks",null], ...Object.entries(TRACKS).map(([k,t]) => [k,t.label,t.c])];
+  $("#filters").innerHTML = opts.map(([k,l,c]) =>
+    `<button class="chip" id="f-${k}" data-f="${k}" aria-pressed="${filter===k}" ${c?`style="--c:${c}"`:""}>${c?"<i></i>":""}${esc(l)} <span class="n">${counts[k]||0}</span></button>`
+  ).join("");
+}
+
+function cardHTML(c){
+  const t = TRACKS[c.track] || {label:c.track||"Other", c:"var(--muted)"};
+  const idx = COLS.findIndex(x => x.id === c.status);
+  const open = openId === c.id;
+  let actions = "";
+  if (canWrite) {
+    actions += idx > 0 ? `<button class="btn" data-move="-1" data-id="${c.id}" aria-label="Move back to ${COLS[idx-1].label}">← ${COLS[idx-1].label}</button>` : "";
+    actions += idx < 2 ? `<button class="btn primary" data-move="1" data-id="${c.id}" aria-label="Move to ${COLS[idx+1].label}">${COLS[idx+1].label} →</button>` : "";
+  }
+  actions += `<button class="btn ghost" data-open="${c.id}" aria-expanded="${open}">${open ? "Close notes" : (c.note ? "Notes ●" : "Notes")}</button>`;
+  let notes = "";
+  if (open) {
+    notes = `<div class="notes">
+      <label class="sr" for="note-${c.id}">Notes for ${esc(c.title)}</label>
+      <textarea id="note-${c.id}" data-note="${c.id}" placeholder="What did you learn? What will you try next?" ${canWrite?"":"readonly"}>${esc(c.note||"")}</textarea>
+      ${canWrite ? `<div class="actions">
+        <button class="btn" data-savenote="${c.id}">Save notes</button>
+        ${confirmDel === c.id
+          ? `<span class="meta">Remove this card?</span><button class="btn danger" data-del="${c.id}">Remove</button><button class="btn ghost" data-canceldel="1">Keep</button>`
+          : `<button class="btn ghost" data-askdel="${c.id}">Remove card</button>`}
+      </div>` : ""}
+    </div>`;
+  }
+  return `<article class="card" draggable="${canWrite}" data-id="${c.id}" data-status="${c.status}" style="--c:${t.c}">
+    <div class="top"><span class="tag">${esc(t.label)}</span>${c.est?`<span class="meta">${esc(c.est)}</span>`:""}</div>
+    <h3>${esc(c.title)}</h3>
+    ${c.detail ? `<div class="meta">${fmt(c.detail)}</div>` : ""}
+    ${c.url ? `<div class="meta"><a href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.urlLabel || "Open resource")} ↗</a></div>` : ""}
+    <div class="actions">${actions}</div>
+    ${notes}
+  </article>`;
+}
+
+function addFormHTML(col){
+  return `<form class="addform" data-addform="${col}">
+    <label class="sr" for="add-title">Card title</label>
+    <input id="add-title" name="title" placeholder="What do you want to learn or try?" required>
+    <div class="row">
+      <label class="sr" for="add-track">Track</label>
+      <select id="add-track" name="track">${Object.entries(TRACKS).map(([k,t])=>`<option value="${k}">${t.label}</option>`).join("")}</select>
+      <label class="sr" for="add-url">Link</label>
+      <input id="add-url" name="url" placeholder="Link (optional)" type="url">
+    </div>
+    <div class="actions"><button class="btn primary" type="submit">Add card</button><button class="btn ghost" type="button" data-canceladd="1">Cancel</button></div>
+  </form>`;
+}
+
+function render(){
+  $("#board").hidden = false;
+  if (cards.length) $("#status").hidden = true;
+  else showStatus("Your board is empty. Use “+ Add card” in any column, or select Reset board in the Read me.");
+  const total = cards.length, done = cards.filter(c => c.status === "done").length;
+  $("#doneN").textContent = done; $("#totalN").textContent = total;
+  const pct = total ? Math.round(done/total*100) : 0;
+  $("#pct").textContent = pct + "%"; $("#barFill").style.width = pct + "%";
+  renderFilters();
+  const visible = cards.filter(c => filter === "all" || c.track === filter);
+  $("#board").innerHTML = COLS.map(col => {
+    const list = visible.filter(c => c.status === col.id).sort((a,b) => (a.order??0) - (b.order??0));
+    return `<section class="col" data-col="${col.id}" aria-label="${col.label}">
+      <h2>${col.label} <span class="count">${list.length}</span></h2>
+      <div class="list">${list.map(cardHTML).join("") || `<div class="empty">${col.id==="done" ? "Finished items land here." : col.id==="doing" ? "Move a card here when you start it." : "Nothing queued."}</div>`}</div>
+      ${canWrite ? (addingIn === col.id ? addFormHTML(col.id) : `<button class="btn ghost" data-add="${col.id}">+ Add card</button>`) : ""}
+    </section>`;
+  }).join("");
+  if (addingIn) { const i = document.getElementById("add-title"); if (i) i.focus(); }
+}
+
+const maxOrder = status => Math.max(0, ...cards.filter(c => c.status === status).map(c => c.order ?? 0));
+
+const STORE = "claude-learning-board-v1";
+const seed = () => JSON.parse(JSON.stringify(window.LEARNING_CARDS || []));
+function load(){
+  try { const saved = JSON.parse(localStorage.getItem(STORE)); if (Array.isArray(saved)) return saved; } catch(e) {}
+  return seed();
+}
+function save(){
+  try { localStorage.setItem(STORE, JSON.stringify(cards)); }
+  catch(e) { showStatus("Your browser blocked saving, so changes will be lost when you close this tab."); }
+}
+function renderReset(){
+  $("#resetRow").innerHTML = confirmReset
+    ? '<span class="meta">Clear all progress and notes, and reload the cards from cards.js?</span><button class="btn danger" data-reset="yes">Reset board</button><button class="btn ghost" data-reset="no">Cancel</button>'
+    : '<button class="btn" data-reset="ask">Reset board</button>';
+}
+function showStatus(msg){ const s = $("#status"); s.textContent = msg; s.hidden = false; }
+
+async function moveTo(id, status){
+  const c = cards.find(x => x.id === id); if (!c || c.status === status) return;
+  const order = maxOrder(status) + 1;
+  Object.assign(c, {status, order, updatedAt: new Date().toISOString()}); save(); render();
+}
+
+document.addEventListener("click", async e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.reset){
+    if (b.dataset.reset === "ask") confirmReset = true;
+    else if (b.dataset.reset === "no") confirmReset = false;
+    else { confirmReset = false; openId = null; cards = seed(); save(); render(); }
+    renderReset(); return;
+  }
+  if (b.dataset.f){ filter = b.dataset.f; try{localStorage.setItem("lb-filter", filter);}catch(_){} render(); return; }
+  if (b.dataset.move){
+    const c = cards.find(x => x.id === b.dataset.id);
+    const idx = COLS.findIndex(x => x.id === c.status) + Number(b.dataset.move);
+    if (COLS[idx]) moveTo(c.id, COLS[idx].id); return;
+  }
+  if (b.dataset.open){ openId = openId === b.dataset.open ? null : b.dataset.open; confirmDel = null; render(); return; }
+  if (b.dataset.savenote){
+    const id = b.dataset.savenote, v = document.getElementById("note-"+id).value;
+    const c = cards.find(x => x.id === id); if (c) { c.note = v; save(); render(); }
+    return;
+  }
+  if (b.dataset.askdel){ confirmDel = b.dataset.askdel; render(); return; }
+  if (b.dataset.canceldel){ confirmDel = null; render(); return; }
+  if (b.dataset.del){ const id = b.dataset.del; confirmDel = null; openId = null; cards = cards.filter(x => x.id !== id); save(); render(); return; }
+  if (b.dataset.add){ addingIn = b.dataset.add; render(); return; }
+  if (b.dataset.canceladd){ addingIn = null; render(); return; }
+});
+
+document.addEventListener("submit", async e => {
+  const f = e.target.closest("[data-addform]"); if (!f) return;
+  e.preventDefault();
+  const fd = new FormData(f), status = f.dataset.addform;
+  const title = String(fd.get("title")||"").trim(); if (!title) return;
+  const data = {title, track: fd.get("track"), status, order: maxOrder(status)+1, url: String(fd.get("url")||"").trim(), note:"", createdAt: new Date().toISOString()};
+  addingIn = null;
+  cards.push({id: "c" + Date.now().toString(36), ...data}); save(); render();
+});
+
+// Drag and drop between columns (desktop)
+let dragId = null;
+document.addEventListener("dragstart", e => { const c = e.target.closest(".card"); if (!c || !canWrite) return; dragId = c.dataset.id; c.classList.add("dragging"); e.dataTransfer.effectAllowed = "move"; try{e.dataTransfer.setData("text/plain", dragId);}catch(_){} });
+document.addEventListener("dragend", e => { document.querySelectorAll(".dragging,.over").forEach(n => n.classList.remove("dragging","over")); dragId = null; });
+document.addEventListener("dragover", e => { const col = e.target.closest(".col"); if (!col || !dragId) return; e.preventDefault(); document.querySelectorAll(".col.over").forEach(n => n !== col && n.classList.remove("over")); col.classList.add("over"); });
+document.addEventListener("drop", e => { const col = e.target.closest(".col"); if (!col || !dragId) return; e.preventDefault(); col.classList.remove("over"); moveTo(dragId, col.dataset.col); });
+
+cards = load();
+renderReset();
+render();
+</script>
+</body>
+</html>
