@@ -4,7 +4,7 @@ A static kanban board for tracking how a designer learns to work with Claude. No
 
 ## Files
 
-- `index.html`: the whole app (markup, CSS tokens for light and dark themes, and vanilla JS).
+- `index.html`: the whole app (markup, dark-only CSS tokens, and vanilla JS).
 - `cards.js`: the starting cards, assigned to `window.LEARNING_CARDS`. It's a `.js` file rather than JSON because browsers block fetching JSON from `file://`, and a script tag works everywhere.
 - `scripts/validate-cards.mjs`: checks `cards.js`. Run `node scripts/validate-cards.mjs` after every change to it.
 - `CONTRIBUTING.md`: the card rules for contributors.
