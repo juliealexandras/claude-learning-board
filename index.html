@@ -11,7 +11,7 @@
 :root{
   --paper:#F2F1ED; --sheet:#F7F7F4; --ink:#26251E; --muted:#6B695F; --line:#DEDCD6; --grid:#EBEAE5;
   --accent:#F54E00; --accent-soft:#FBE4D8; --done:#1F8A65; --danger:#CF2D56; --on-ink:#F7F7F4;
-  --t-academy:#6A3FD1; --t-design:#C2410C; --t-figma:#0F7C86; --t-habits:#9A6B00;
+  --t-academy:#6A3FD1; --t-design:#C2410C; --t-figma:#0F7C86; --t-habits:#9A6B00; --t-misc:#3F6AA8;
   --display:"Bricolage Grotesque", "Helvetica Neue", Arial, sans-serif;
   --body:"Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
@@ -19,11 +19,11 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --paper:#14120B; --sheet:#1D1B15; --ink:#EDECE8; --muted:#A29F95; --line:#34322A; --grid:#1A1811;
   --accent:#FF6A24; --accent-soft:#3A2416; --done:#4FC79A; --danger:#F06A8A; --on-ink:#14120B;
-  --t-academy:#B79BFF; --t-design:#FF9B6A; --t-figma:#5ED3DD; --t-habits:#E8C15A; color-scheme:dark}}
+  --t-academy:#B79BFF; --t-design:#FF9B6A; --t-figma:#5ED3DD; --t-habits:#E8C15A; --t-misc:#8DB2EC; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#14120B; --sheet:#1D1B15; --ink:#EDECE8; --muted:#A29F95; --line:#34322A; --grid:#1A1811;
   --accent:#FF6A24; --accent-soft:#3A2416; --done:#4FC79A; --danger:#F06A8A; --on-ink:#14120B;
-  --t-academy:#B79BFF; --t-design:#FF9B6A; --t-figma:#5ED3DD; --t-habits:#E8C15A; color-scheme:dark}
+  --t-academy:#B79BFF; --t-design:#FF9B6A; --t-figma:#5ED3DD; --t-habits:#E8C15A; --t-misc:#8DB2EC; color-scheme:dark}
 
 *{box-sizing:border-box}
 body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
@@ -118,18 +118,19 @@ textarea{min-height:64px;resize:vertical}
         <ul>
           <li>Drag a card to another column, or use the arrow buttons on any device.</li>
           <li>Open <b>Notes</b> on a card to record what you learned and the prompts that worked. Select <b>Save notes</b> when you finish.</li>
-          <li>Use <b>+ Add card</b> in any column to add your own item.</li>
+          <li>Use <b>+ Add card</b> in any column to add your own item. New cards default to <b>Misc</b>, so it's a quick way to suggest a useful link.</li>
           <li>Use the chips above the board to focus on one track.</li>
           <li>Remove a card from its Notes panel.</li>
         </ul>
       </div>
       <div>
-        <h3>The four tracks</h3>
+        <h3>The five tracks</h3>
         <ul>
           <li><span class="tk" style="--c:var(--t-academy)"></span><b>Claude Academy:</b> free official courses and Anthropic's prompting guides.</li>
           <li><span class="tk" style="--c:var(--t-design)"></span><b>Claude Design:</b> prototypes, explorations, and design system use.</li>
           <li><span class="tk" style="--c:var(--t-figma)"></span><b>Code + Figma:</b> Claude Code with the Figma plugin, both directions.</li>
           <li><span class="tk" style="--c:var(--t-habits)"></span><b>Habits:</b> everyday practices that improve results.</li>
+          <li><span class="tk" style="--c:var(--t-misc)"></span><b>Misc:</b> extra references and suggestions from anyone using the board, such as an article, video, tool, or template.</li>
         </ul>
       </div>
       <div>
@@ -158,6 +159,7 @@ const TRACKS = {
   design:  {label:"Claude Design",  c:"var(--t-design)"},
   figma:   {label:"Code + Figma",   c:"var(--t-figma)"},
   habits:  {label:"Habits",         c:"var(--t-habits)"},
+  misc:    {label:"Misc",           c:"var(--t-misc)"},
 };
 const COLS = [
   {id:"todo",  label:"Up next"},
@@ -225,10 +227,12 @@ function addFormHTML(col){
     <input id="add-title" name="title" placeholder="What do you want to learn or try?" required>
     <div class="row">
       <label class="sr" for="add-track">Track</label>
-      <select id="add-track" name="track">${Object.entries(TRACKS).map(([k,t])=>`<option value="${k}">${t.label}</option>`).join("")}</select>
+      <select id="add-track" name="track">${Object.entries(TRACKS).map(([k,t])=>`<option value="${k}" ${k==="misc"?"selected":""}>${t.label}</option>`).join("")}</select>
       <label class="sr" for="add-url">Link</label>
       <input id="add-url" name="url" placeholder="Link (optional)" type="url">
     </div>
+    <label class="sr" for="add-detail">Why it's useful</label>
+    <input id="add-detail" name="detail" placeholder="Why it's useful (optional)">
     <div class="actions"><button class="btn primary" type="submit">Add card</button><button class="btn ghost" type="button" data-canceladd="1">Cancel</button></div>
   </form>`;
 }
@@ -311,7 +315,7 @@ document.addEventListener("submit", async e => {
   e.preventDefault();
   const fd = new FormData(f), status = f.dataset.addform;
   const title = String(fd.get("title")||"").trim(); if (!title) return;
-  const data = {title, track: fd.get("track"), status, order: maxOrder(status)+1, url: String(fd.get("url")||"").trim(), note:"", createdAt: new Date().toISOString()};
+  const data = {title, track: fd.get("track"), status, order: maxOrder(status)+1, url: String(fd.get("url")||"").trim(), detail: String(fd.get("detail")||"").trim(), note:"", createdAt: new Date().toISOString()};
   addingIn = null;
   cards.push({id: "c" + Date.now().toString(36), ...data}); save(); render();
 });

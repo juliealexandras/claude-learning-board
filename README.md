@@ -1,11 +1,12 @@
 # Claude Learning Board
 
-A kanban board for designers learning to work with Claude. It tracks 23 courses, experiments, and habits across four tracks:
+A kanban board for designers learning to work with Claude. It starts with 23 courses, experiments, and habits across five tracks:
 
 - **Claude Academy:** free official courses and Anthropic's prompting guides
 - **Claude Design:** prototypes, explorations, and design system use
 - **Code + Figma:** Claude Code with the Figma plugin, in both directions
 - **Habits:** everyday practices that improve results
+- **Misc:** extra references and suggestions you add, such as an article, video, tool, or template
 
 It runs in any browser with no install and no build step. Progress saves in your browser.
 
@@ -76,7 +77,8 @@ Claude Code reads `CLAUDE.md` automatically and edits `cards.js` for you.
 ## 4. Make it yours
 
 - **Change the plan:** edit `cards.js`, then open the board's Read me and select **Reset board** to load your changes. Reset clears your progress and notes.
-- **Add a card from the board:** select **+ Add card** in any column.
+- **Add a card from the board:** select **+ Add card** in any column. New cards default to the Misc track and include an optional "Why it's useful" field, so suggesting a link takes a few seconds.
+- **Suggest a reference for everyone:** add a card to `cards.js` with `track: "misc"` and open a pull request.
 - **Take notes:** open **Notes** on any card. Notes save with your progress.
 
 ## What's in the repo

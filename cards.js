@@ -4,7 +4,7 @@
 // Fields:
 //   id        unique text id
 //   title     what to learn or try
-//   track     academy | design | figma | habits
+//   track     academy | design | figma | habits | misc
 //   status    todo | doing | done
 //   order     position within a column (lower comes first)
 //   detail    optional one-line description; wrap commands in `backticks`

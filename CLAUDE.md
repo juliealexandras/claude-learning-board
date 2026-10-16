@@ -9,7 +9,7 @@ A static kanban board for tracking how a designer learns to work with Claude. No
 
 ## Card fields
 
-`id`, `title`, `track` (`academy` | `design` | `figma` | `habits`), `status` (`todo` | `doing` | `done`), `order`, and optional `detail`, `url`, `urlLabel`, `note`. Wrap commands in `detail` with backticks to render them as code.
+`id`, `title`, `track` (`academy` | `design` | `figma` | `habits` | `misc`), `status` (`todo` | `doing` | `done`), `order`, and optional `detail`, `url`, `urlLabel`, `note`. Wrap commands in `detail` with backticks to render them as code.
 
 ## Working in this repo
 
