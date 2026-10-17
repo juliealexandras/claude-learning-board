@@ -13,11 +13,13 @@ A kanban board for designers learning to work with Claude. It starts with 23 cou
 
 ## Tracks
 
-- **Claude Academy:** free official courses and Anthropic's prompting guides
-- **Claude Design:** prototypes, explorations, and design system use
-- **Code + Figma:** Claude Code with the Figma plugin, in both directions
-- **Habits:** everyday practices that improve results
-- **Misc:** extra references and suggestions you add, such as an article, video, tool, or template
+| | Track | Color | What's in it |
+| :---: | --- | --- | --- |
+| <img src="docs/shapes/academy.svg" width="22" height="22" alt=""> | **Claude Academy** | `#B46AD8` orchid | Free official courses and Anthropic's prompting guides |
+| <img src="docs/shapes/design.svg" width="22" height="22" alt=""> | **Claude Design** | `#E5795A` coral | Prototypes, explorations, and design systems |
+| <img src="docs/shapes/figma.svg" width="22" height="22" alt=""> | **Code + Figma** | `#7B87F0` periwinkle | Claude Code with the Figma plugin, in both directions |
+| <img src="docs/shapes/habits.svg" width="22" height="22" alt=""> | **Habits** | `#7FD9BF` mint | Everyday practices that improve results |
+| <img src="docs/shapes/misc.svg" width="22" height="22" alt=""> | **Misc** | `#F09ACB` pink | Extra references and suggestions you add |
 
 Cards move through **To do**, **Doing**, and **Done**. Cards that weren't useful, or whose tools are archived or unavailable, go to **Did not finish** and don't count toward progress.
 
@@ -111,6 +113,7 @@ A weekly GitHub Action checks every link and opens an issue when one breaks. Ano
 | `CONTRIBUTING.md` | How to suggest, report, and add cards |
 | `scripts/validate-cards.mjs` | Checks `cards.js` for mistakes, with no dependencies |
 | `.github/` | Issue forms, pull request template, and the two Actions |
+| `docs/shapes/` | The track shapes as SVGs, used in this README |
 | `docs/MAINTAINER-SETUP.md` | One-time GitHub settings for the repo owner |
 
 ## Good to know
