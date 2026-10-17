@@ -2,6 +2,7 @@
 
 ## v1.6.0 (2026-10-16)
 
+- Track colors named after foods: Ube, Papaya, Butterfly Pea, Pistachio, and Dragon Fruit
 - Each track has its own geometric shape in its color, in filters, the Read me, and card chips
 - Inter for notes
 

@@ -15,11 +15,11 @@ A kanban board for designers learning to work with Claude. It starts with 23 cou
 
 | | Track | Color | What's in it |
 | :---: | --- | --- | --- |
-| <img src="docs/shapes/academy.svg" width="22" height="22" alt=""> | **Claude Academy** | `#B46AD8` orchid | Free official courses and Anthropic's prompting guides |
-| <img src="docs/shapes/design.svg" width="22" height="22" alt=""> | **Claude Design** | `#E5795A` coral | Prototypes, explorations, and design systems |
-| <img src="docs/shapes/figma.svg" width="22" height="22" alt=""> | **Code + Figma** | `#7B87F0` periwinkle | Claude Code with the Figma plugin, in both directions |
-| <img src="docs/shapes/habits.svg" width="22" height="22" alt=""> | **Habits** | `#7FD9BF` mint | Everyday practices that improve results |
-| <img src="docs/shapes/misc.svg" width="22" height="22" alt=""> | **Misc** | `#F09ACB` pink | Extra references and suggestions you add |
+| <img src="docs/shapes/academy.svg" width="22" height="22" alt=""> | **Claude Academy** | `#B46AD8` Ube | Free official courses and Anthropic's prompting guides |
+| <img src="docs/shapes/design.svg" width="22" height="22" alt=""> | **Claude Design** | `#E5795A` Papaya | Prototypes, explorations, and design systems |
+| <img src="docs/shapes/figma.svg" width="22" height="22" alt=""> | **Code + Figma** | `#7B87F0` Butterfly Pea | Claude Code with the Figma plugin, in both directions |
+| <img src="docs/shapes/habits.svg" width="22" height="22" alt=""> | **Habits** | `#7FD9BF` Pistachio | Everyday practices that improve results |
+| <img src="docs/shapes/misc.svg" width="22" height="22" alt=""> | **Misc** | `#F09ACB` Dragon Fruit | Extra references and suggestions you add |
 
 Cards move through **To do**, **Doing**, and **Done**. Cards that weren't useful, or whose tools are archived or unavailable, go to **Did not finish** and don't count toward progress.
 
