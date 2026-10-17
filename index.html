@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Claude Learning Board</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Jost:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Permanent+Marker&family=Jost:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <style>
 /* Layout: an indigo frame around a grainy charcoal sheet, like a 90s product mockup. Header, Read me, track chips, then four boards of floppy disk cards. Single dark theme by design. */
 :root{
@@ -18,13 +18,15 @@
   --body:"futura-pt","Futura PT",Futura,"Jost","Century Gothic",system-ui,sans-serif;
   --display:"Anton","Impact","Arial Narrow",sans-serif;
   --mono:"Space Mono",ui-monospace,Menlo,Consolas,monospace;
+  --marker:"Permanent Marker","Marker Felt","Comic Sans MS",cursive;
+  --note:Verdana,Geneva,Tahoma,sans-serif;
   --grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .07 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{background:var(--frame)}
-body{background:var(--frame);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
-.sheet{margin:clamp(8px,1.6vw,20px);background:var(--bg) var(--grain);border-radius:2px;min-height:calc(100vh - 2*clamp(8px,1.6vw,20px))}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.sheet{background:var(--bg) var(--grain);min-height:100vh}
 .wrap{max-width:1320px;margin:0 auto;padding-block:clamp(22px,3vw,40px) 40px;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
   display:flex;flex-direction:column;gap:22px}
@@ -53,6 +55,8 @@ h1{font-family:var(--body);font-weight:700;text-transform:uppercase;letter-spaci
 .readme b{font-weight:600}
 .readme code{font-family:var(--mono);font-size:12px;background:var(--slot);color:var(--ink);padding:1px 4px}
 .detail code{font-family:var(--mono);font-size:11px;background:rgba(26,26,29,.08);color:var(--paper-ink);padding:1px 4px;overflow-wrap:anywhere}
+.readme .tracks{list-style:none;padding:0;gap:7px}
+.readme .tracks li span:last-child{color:var(--muted);font-size:13px;margin-left:6px}
 .readme .tk{display:inline-block;width:10px;height:10px;background:var(--c);margin-right:7px;vertical-align:-1px}
 
 /* Notices and status */
@@ -106,13 +110,14 @@ h1{font-family:var(--body);font-weight:700;text-transform:uppercase;letter-spaci
 .label-wrap::before{left:-18px}
 .label-wrap::after{right:-18px}
 .label{position:relative;background:var(--paper);padding:9px 12px 10px;border-radius:3px 3px 0 0;min-width:0}
-.label-meta{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-muted);border-bottom:1px solid rgba(26,26,29,.25);padding-bottom:6px}
-.disk h3{font:600 16px/1.25 var(--body);margin:8px 0 4px;overflow-wrap:anywhere}
+.meta-link{color:var(--paper-ink);text-decoration:underline;text-decoration-color:var(--c);text-decoration-thickness:2px;text-underline-offset:3px;min-width:0;overflow-wrap:anywhere}
+.meta-link:hover{background:var(--c);color:var(--paper-ink)}
+.label-meta{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-muted);border-bottom:1px solid rgba(26,26,29,.25);padding-bottom:6px}
+.disk h3{font:400 19px/1.25 var(--marker);color:#1F1E3A;margin:9px 0 5px;transform:rotate(-1deg);transform-origin:left center;overflow-wrap:anywhere}
 .detail{margin:0;font-size:13px;line-height:1.4;color:var(--paper-muted);overflow-wrap:anywhere}
-.holo{display:block;margin-top:10px;padding:6px 8px;background:var(--holo);color:var(--paper-ink);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;overflow-wrap:anywhere}
-a.holo:hover{text-decoration:underline;text-underline-offset:3px}
-.holo-blank{height:8px;padding:0}
-.stamp{position:absolute;right:10px;top:4px;font-family:var(--display);font-size:16px;line-height:1.3;letter-spacing:.06em;text-transform:uppercase;color:#C23B22;border:2px solid currentColor;padding:0 6px;transform:rotate(-9deg);opacity:.85;pointer-events:none}
+.holo-strip{display:block;height:6px;margin-top:10px;background:var(--holo)}
+.meta-right{white-space:nowrap;flex:none}
+.stamp{position:absolute;right:8px;top:-9px;background:var(--paper);font-family:var(--display);font-size:17px;line-height:1.3;letter-spacing:.06em;text-transform:uppercase;color:#C23B22;border:2px solid currentColor;padding:0 6px;transform:rotate(-9deg);opacity:.85;pointer-events:none}
 
 /* Did not finish: ripped label */
 .disk[data-status="dnf"]{filter:saturate(.45) brightness(.82);cursor:default}
@@ -120,7 +125,12 @@ a.holo:hover{text-decoration:underline;text-underline-offset:3px}
 .disk[data-status="dnf"] .label{clip-path:polygon(0 0,100% 0,100% 30%,94% 37%,97% 45%,89% 52%,92% 60%,83% 66%,86% 74%,76% 79%,79% 87%,68% 92%,70% 100%,0 100%)}
 
 /* Band of actions under the label */
-.band{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--slot);padding:8px 10px;color:var(--ink)}
+.band{display:flex;flex-direction:column;gap:6px;background:var(--slot);padding:8px 10px;color:var(--ink)}
+.band-row{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:6px}
+.disk textarea.note{font:13px/1.5 var(--note);background:transparent;border:0;color:var(--ink);padding:2px 0;min-height:0;resize:none;overflow:hidden;width:100%}
+.disk textarea.note::placeholder{color:var(--muted)}
+.disk select.move{width:auto;font:600 10px var(--body);letter-spacing:.1em;text-transform:uppercase;background:var(--slot);color:var(--muted);border:1px solid var(--line);padding:4px 6px;cursor:pointer}
+.disk select.move:hover{color:var(--ink);border-color:var(--muted)}
 .band .meta{font-family:var(--mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .btn{font:600 11px var(--body);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);background:transparent;color:var(--ink);padding:5px 9px;cursor:pointer}
 .btn:hover{border-color:var(--ink)}
@@ -162,37 +172,30 @@ textarea{min-height:72px;resize:vertical}
     <div class="body">
       <div>
         <h3>What this is</h3>
-        <p>A learning plan for working better with Claude as a designer, design engineer, and studio owner. Each card is one course, experiment, or habit. Cards start in a suggested order, top to bottom.</p>
+        <p>A learning plan for working better with Claude. Each disk is a course, experiment, or habit, in suggested order.</p>
       </div>
       <div>
         <h3>How to use it</h3>
         <ul>
-          <li>Drag a card to another column, or use the arrow buttons on any device.</li>
-          <li>Open <b>Notes</b> on a card to record what you learned and the prompts that worked. Select <b>Save notes</b> when you finish.</li>
-          <li>Use <b>+ Add card</b> in any column to add your own item. New cards default to <b>Misc</b>, so it's a quick way to suggest a useful link.</li>
-          <li>Use the chips above the board to focus on one track.</li>
-          <li>Remove a card from its Notes panel.</li>
-          <li>Select <b>DNF</b> (did not finish) when a card wasn't useful or its tool is archived or unavailable. DNF cards don't count toward progress, and you can restore them anytime.</li>
+          <li>Drag a disk to move it, or use <b>Move</b> on the disk.</li>
+          <li>Type notes in the black band. They save as you go.</li>
+          <li><b>Did not finish</b> is for disks that weren't useful or are gone.</li>
+          <li><b>+ Add card</b> adds your own link to Misc.</li>
         </ul>
       </div>
       <div>
-        <h3>The five tracks</h3>
-        <ul>
-          <li><span class="tk" style="--c:var(--t-academy)"></span><b>Claude Academy:</b> free official courses and Anthropic's prompting guides.</li>
-          <li><span class="tk" style="--c:var(--t-design)"></span><b>Claude Design:</b> prototypes, explorations, and design system use.</li>
-          <li><span class="tk" style="--c:var(--t-figma)"></span><b>Code + Figma:</b> Claude Code with the Figma plugin, both directions.</li>
-          <li><span class="tk" style="--c:var(--t-habits)"></span><b>Habits:</b> everyday practices that improve results.</li>
-          <li><span class="tk" style="--c:var(--t-misc)"></span><b>Misc:</b> extra references and suggestions from anyone using the board, such as an article, video, tool, or template.</li>
+        <h3>Tracks</h3>
+        <ul class="tracks">
+          <li><span class="tk" style="--c:var(--t-academy)"></span>Claude Academy <span>Courses and guides</span></li>
+          <li><span class="tk" style="--c:var(--t-design)"></span>Claude Design <span>Prototypes and systems</span></li>
+          <li><span class="tk" style="--c:var(--t-figma)"></span>Code + Figma <span>Design to code and back</span></li>
+          <li><span class="tk" style="--c:var(--t-habits)"></span>Habits <span>Everyday practice</span></li>
+          <li><span class="tk" style="--c:var(--t-misc)"></span>Misc <span>Your suggestions</span></li>
         </ul>
       </div>
       <div>
         <h3>Your progress</h3>
-        <ul>
-          <li>Progress saves in this browser. Select <b>Export progress</b> to back it up or move it, and <b>Import progress</b> to load it in another browser.</li>
-          <li>When the plan in <code>cards.js</code> changes, for example after a <code>git pull</code>, new cards appear automatically. Your progress and notes stay.</li>
-          <li><b>Reset board</b> clears all progress and notes and reloads the plan.</li>
-          <li>Ask Claude to review your board anytime for a suggestion on what to do next.</li>
-        </ul>
+        <p>Saves in this browser. New cards from <code>cards.js</code> appear on their own. Export to back up or switch browsers.</p>
         <div class="actions" id="dataRow" style="margin-top:12px"></div>
         <label class="sr" for="importFile">Import progress file</label>
         <input type="file" id="importFile" accept="application/json,.json" hidden>
@@ -248,53 +251,45 @@ function renderFilters(){
   ).join("");
 }
 
+function moveOptions(c){
+  const o = ['<option value="" selected disabled>Move…</option>'];
+  for (const col of COLS) if (col.id !== "dnf" && col.id !== c.status) o.push(`<option value="${col.id}">${col.label}</option>`);
+  if (c.status !== "dnf") o.push(`<optgroup label="Did not finish">${REASONS.map(r => `<option value="dnf:${r}">${r}</option>`).join("")}</optgroup>`);
+  o.push('<option value="remove">Remove disk</option>');
+  return o.join("");
+}
+
 function cardHTML(c){
   const t = TRACKS[c.track] || {label:c.track||"Other", c:"var(--muted)"};
-  const idx = COLS.findIndex(x => x.id === c.status);
-  const open = openId === c.id;
   const num = String(cards.indexOf(c) + 1).padStart(2, "0");
-  let actions = "";
+  const dnf = c.status === "dnf";
+  const left = c.url
+    ? `<a class="meta-link" href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.urlLabel || "Open resource")} ↗</a>`
+    : `<span>MF2HD · 1.44 MB</span>`;
+  const right = dnf ? esc(c.dnfReason || "Set aside") : c.status === "done" ? "" : (c.lastChecked ? `<span title="Link last checked">${fmtDate(c.lastChecked)}</span>` : "");
+  let controls = "";
   if (canWrite) {
-    if (c.status === "dnf") {
-      actions += `<button class="btn primary" data-restore="${c.id}">Restore</button>`;
-    } else {
-      actions += idx > 0 ? `<button class="btn" data-move="-1" data-id="${c.id}" aria-label="Move back to ${COLS[idx-1].label}">← ${COLS[idx-1].label}</button>` : "";
-      actions += idx < 2 ? `<button class="btn primary" data-move="1" data-id="${c.id}" aria-label="Move to ${COLS[idx+1].label}">${COLS[idx+1].label} →</button>` : "";
-      actions += dnfAsk === c.id
-        ? `<span class="meta">Why?</span>` + REASONS.map(r => `<button class="btn" data-dnf="${c.id}" data-reason="${r}">${r}</button>`).join("") + `<button class="btn ghost" data-dnfcancel="1">Cancel</button>`
-        : `<button class="btn ghost" data-dnfask="${c.id}" aria-label="Mark ${esc(c.title)} as did not finish">DNF</button>`;
-    }
+    controls = confirmDel === c.id
+      ? `<div class="band-row"><span class="meta">Remove this disk?</span><button class="btn danger" data-del="${c.id}">Remove</button><button class="btn ghost" data-canceldel="1">Keep</button></div>`
+      : `<div class="band-row"><label class="sr" for="move-${c.id}">Move ${esc(c.title)}</label><select class="move" id="move-${c.id}" data-moveselect="${c.id}">${moveOptions(c)}</select></div>`;
   }
-  actions += `<button class="btn ghost" data-open="${c.id}" aria-expanded="${open}">${open ? "Close notes" : (c.note ? "Notes ●" : "Notes")}</button>`;
-  let notes = "";
-  if (open) {
-    notes = `<div class="notes">
-      <label class="sr" for="note-${c.id}">Notes for ${esc(c.title)}</label>
-      <textarea id="note-${c.id}" data-note="${c.id}" placeholder="What did you learn? What will you try next?" ${canWrite?"":"readonly"}>${esc(c.note||"")}</textarea>
-      ${canWrite ? `<div class="actions">
-        <button class="btn" data-savenote="${c.id}">Save notes</button>
-        ${confirmDel === c.id
-          ? `<span class="meta">Remove this card?</span><button class="btn danger" data-del="${c.id}">Remove</button><button class="btn ghost" data-canceldel="1">Keep</button>`
-          : `<button class="btn ghost" data-askdel="${c.id}">Remove card</button>`}
-      </div>` : ""}
-    </div>`;
-  }
-  const meta = c.status === "dnf" ? `DNF · ${esc(c.dnfReason || "Set aside")}`
-    : c.lastChecked ? `Checked ${fmtDate(c.lastChecked)}` : "MF2HD · 1.44 MB";
-  return `<article class="disk" draggable="${canWrite && c.status !== "dnf"}" data-id="${c.id}" data-status="${c.status}" style="--c:${t.c}">
+  return `<article class="disk" draggable="${canWrite && !dnf}" data-id="${c.id}" data-status="${c.status}" style="--c:${t.c}">
     <div class="disk-top">
       <span class="arrow" aria-hidden="true"></span>
       <div class="shutter"><span class="num" aria-hidden="true">${num}</span><span class="shut-meta">${esc(t.label)}</span><i class="window" aria-hidden="true"></i></div>
     </div>
     <div class="label-wrap"><div class="label">
-      <div class="label-meta"><span>${meta}</span><span aria-hidden="true">${c.status === "doing" ? "In use" : ""}</span></div>
       ${c.status === "done" ? `<span class="stamp" aria-hidden="true">Done</span>` : ""}
+      <div class="label-meta">${left}<span class="meta-right">${right}</span></div>
       <h3>${esc(c.title)}</h3>
       ${c.detail ? `<p class="detail">${fmt(c.detail)}</p>` : ""}
-      ${c.url ? `<a class="holo" href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.urlLabel || "Open resource")} ↗</a>` : `<span class="holo holo-blank" aria-hidden="true"></span>`}
+      <span class="holo-strip" aria-hidden="true"></span>
     </div></div>
-    <div class="band">${actions}</div>
-    ${notes}
+    <div class="band">
+      <label class="sr" for="note-${c.id}">Notes for ${esc(c.title)}</label>
+      <textarea class="note" id="note-${c.id}" data-note="${c.id}" rows="1" placeholder="${canWrite ? "Write a note…" : "No notes yet"}" ${canWrite ? "" : "readonly"}>${esc(c.note || "")}</textarea>
+      ${controls}
+    </div>
   </article>`;
 }
 
@@ -345,6 +340,7 @@ function render(){
 // Each board shows up to six disks, then scrolls inside itself.
 const MAX_VISIBLE = 6;
 function capLists(scrolls = {}){
+  document.querySelectorAll("textarea[data-note]").forEach(grow);
   document.querySelectorAll(".list[data-list]").forEach(list => {
     const items = list.querySelectorAll(":scope > .disk");
     const range = list.parentElement.querySelector(".range");
@@ -366,6 +362,34 @@ function capLists(scrolls = {}){
 let capTimer;
 window.addEventListener("resize", () => { clearTimeout(capTimer); capTimer = setTimeout(() => capLists(), 150); });
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => capLists());
+
+// Notes save as you type. The Move menu replaces the old buttons.
+function grow(t){ t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }
+const listScrolls = () => { const s = {}; document.querySelectorAll(".list[data-list]").forEach(l => { s[l.dataset.list] = l.scrollTop; }); return s; };
+const noteTimers = {};
+document.addEventListener("input", e => {
+  const t = e.target.closest && e.target.closest("textarea[data-note]"); if (!t) return;
+  grow(t);
+  const id = t.dataset.note; clearTimeout(noteTimers[id]);
+  noteTimers[id] = setTimeout(() => persistNote(id, t.value), 600);
+});
+document.addEventListener("focusout", e => {
+  const t = e.target.closest && e.target.closest("textarea[data-note]"); if (!t || t.readOnly) return;
+  const id = t.dataset.note; clearTimeout(noteTimers[id]); persistNote(id, t.value); capLists(listScrolls());
+});
+document.addEventListener("change", e => {
+  const s = e.target.closest && e.target.closest("select[data-moveselect]"); if (!s) return;
+  const id = s.dataset.moveselect, v = s.value; s.value = "";
+  if (v === "remove") { confirmDel = id; render(); return; }
+  if (v.startsWith("dnf:")) { moveTo(id, "dnf", v.slice(4)); return; }
+  moveTo(id, v);
+});
+// Let people select text in notes without starting a drag.
+document.addEventListener("mousedown", e => {
+  const d = e.target.closest && e.target.closest(".disk"); if (!d) return;
+  d.draggable = canWrite && d.dataset.status !== "dnf" && !e.target.closest("textarea,select,a,button");
+});
+function persistNote(id, v){ const c = cards.find(x => x.id === id); if (c && (c.note || "") !== v){ c.note = v; save(); } }
 
 const maxOrder = status => Math.max(0, ...cards.filter(c => c.status === status).map(c => c.order ?? 0));
 

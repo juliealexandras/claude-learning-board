@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.0 (2026-10-16)
+
+- Simpler disks: one Move menu replaces the move, DNF, notes, and remove buttons
+- Notes are typed straight into the disk's black band, in Verdana, and save as you type
+- The link moves into the label's top line, and titles look handwritten in marker
+- Shorter Read me, with color blocks instead of bullets for tracks
+- Removed the indigo frame around the page
+
 ## v1.1.0 (2026-10-16)
 
 - 90s floppy disk redesign: each card is a disk with a shutter, paper label, and holographic link strip

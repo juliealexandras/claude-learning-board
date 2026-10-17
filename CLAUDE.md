@@ -11,10 +11,10 @@ A static kanban board for tracking how a designer learns to work with Claude. No
 
 ## Design
 
-- Dark only, by design: an indigo frame around a grainy charcoal sheet. Colors are tokens on `:root`.
+- Dark only, by design: a grainy charcoal background. Colors are tokens on `:root`.
 - Track colors: Academy orchid `#B46AD8`, Code + Figma periwinkle `#5D6BD6`, Design coral `#E5795A`, Habits holo mint `#7FD9BF`, Misc holo pink `#F09ACB`.
-- Type: `--body` is Futura PT with Jost as the free fallback (Futura PT is an Adobe font and can't ship in this repo), `--display` is Anton for board titles and disk numbers, `--mono` is Space Mono for captions.
-- Cards are floppy disks (`.disk`): shutter with number and track, paper label with text, holographic link strip, dark action band. In progress shows a lit shutter window, Done gets a stamp, Did not finish gets a ripped label. Keep text on the solid paper label for contrast.
+- Type: `--body` is Futura PT with Jost as the free fallback (Futura PT is an Adobe font and can't ship in this repo), `--display` is Anton for board titles and disk numbers, `--mono` is Space Mono for captions, `--marker` is Permanent Marker for disk titles, and `--note` is Verdana for notes.
+- Cards are floppy disks (`.disk`): shutter with number and track, paper label with the link in its top line, a marker-style title, a holographic strip, and a dark band that is the note field. One Move menu handles moving, Did not finish, and removing; drag also works. In progress shows a lit shutter window, Done gets a stamp, Did not finish gets a ripped label. Keep text on the solid paper label for contrast.
 - Each board shows six disks (`MAX_VISIBLE`), then scrolls inside itself with a range counter.
 
 ## Card fields

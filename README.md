@@ -91,8 +91,8 @@ Claude Code reads `CLAUDE.md` automatically, edits `cards.js`, and runs the vali
 
 - **Change the plan:** edit `cards.js`, then run `node scripts/validate-cards.mjs` to check it. Reload the board to see new cards.
 - **Add a card from the board:** select **+ Add card** in any column. New cards default to Misc and include an optional "Why it's useful" field.
-- **Take notes:** open **Notes** on any card.
-- **Set a card aside:** select **DNF** (did not finish) and pick a reason. Restore it anytime.
+- **Take notes:** type in the black band on any disk. Notes save as you type.
+- **Move a disk:** drag it, or use the **Move** menu on the disk. The menu also sets a disk aside as **Did not finish** with a reason, and removes disks.
 
 ## Contributing
 
@@ -116,7 +116,7 @@ A weekly GitHub Action checks every link and opens an issue when one breaks. Ano
 
 - The board has a 90s floppy disk look: each card is a disk in its track color, with a ripped label for Did not finish and a stamp for Done. It's dark only by design.
 - Each board shows six disks, then scrolls inside itself with a counter like "1–6 of 17".
-- Type is Futura PT when you have it installed or in an Adobe Fonts kit, with Jost as the free fallback, Anton for board titles, and Space Mono for captions. Fonts load from Google Fonts and fall back to system fonts offline.
+- Type is Futura PT when you have it installed or in an Adobe Fonts kit, with Jost as the free fallback. Disk titles are in Permanent Marker, like a label written in marker. Board titles use Anton, captions use Space Mono, and notes use Verdana for easy reading. Fonts load from Google Fonts and fall back to system fonts offline.
 - The board works on phones.
 - Some cards point to products that may need a paid plan, such as Claude Design and Figma Dev Mode MCP.
 - Each card shows when its link was last checked.
