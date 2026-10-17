@@ -137,6 +137,23 @@ textarea,input,select{font:14px var(--body);color:var(--ink);background:var(--bg
 .addform .row > *{flex:1 1 140px}
 .meta{font-size:12px;color:var(--muted)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* Layout toggle */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:space-between;align-items:center}
+.view-toggle{display:inline-flex;gap:2px;border:1px solid var(--line);border-radius:99px;padding:3px;background:var(--panel)}
+.view-toggle button{font:500 13px var(--body);border:0;background:transparent;color:var(--muted);padding:5px 12px;border-radius:99px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.view-toggle button:hover{color:var(--ink)}
+.view-toggle button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+/* Row view: one board per row, cards side by side */
+.board.rows{grid-template-columns:minmax(0,1fr)}
+.board.rows .col{min-height:0}
+.board.rows .list{flex-direction:row;align-items:flex-start;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:8px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+.board.rows .list::-webkit-scrollbar{height:8px}
+.board.rows .list::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}
+.board.rows .list > .card{flex:0 0 clamp(250px,78vw,300px);scroll-snap-align:start}
+.board.rows .col-foot{justify-content:flex-end}
+.board.rows .addform{max-width:460px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -164,6 +181,7 @@ textarea,input,select{font:14px var(--body);color:var(--ink);background:var(--bg
         <h3>How to use it</h3>
         <ul>
           <li>Drag a card to move it, or use <b>Move</b> on the card.</li>
+          <li>Switch between <b>Rows</b> and <b>Columns</b> above the board.</li>
           <li>Open <b>Notes</b> on a card to write. Notes save as you go.</li>
           <li><b>Did not finish</b> is for cards that weren't useful or are gone.</li>
           <li><b>+</b> on a board adds your own link to Misc.</li>
@@ -191,7 +209,13 @@ textarea,input,select{font:14px var(--body);color:var(--ink);background:var(--bg
 
   <div class="notice" id="notice" role="status" hidden><span id="noticeText"></span><button class="btn ghost" data-dismiss="1">Dismiss</button></div>
 
-  <div class="filters" id="filters" role="group" aria-label="Filter by track"></div>
+  <div class="toolbar">
+    <div class="filters" id="filters" role="group" aria-label="Filter by track"></div>
+    <div class="view-toggle" role="group" aria-label="Board layout">
+      <button type="button" data-view="rows" aria-pressed="true"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="2" y="2.5" width="12" height="4.5" rx="1.5"/><rect x="2" y="9" width="12" height="4.5" rx="1.5"/></svg>Rows</button>
+      <button type="button" data-view="columns" aria-pressed="false"><svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><rect x="2" y="2" width="5" height="12" rx="1.5"/><rect x="9" y="2" width="5" height="12" rx="1.5"/></svg>Columns</button>
+    </div>
+  </div>
 
   <div id="status" class="status">Loading your board.</div>
 
@@ -209,14 +233,15 @@ const TRACKS = {
 };
 const REASONS = ["Not useful", "Archived", "Unavailable"];
 const COLS = [
-  {id:"todo",  label:"Up next"},
-  {id:"doing", label:"In progress"},
+  {id:"todo",  label:"To do"},
+  {id:"doing", label:"Doing"},
   {id:"done",  label:"Done"},
   {id:"dnf",   label:"Did not finish"},
 ];
 let cards = [], removed = [], pendingImport = null, confirmReset = false, filter = "all", openId = null, dnfAsk = null, addingIn = null, confirmDel = null, canWrite = true;
 let filterSaved; try { filterSaved = localStorage.getItem("lb-filter"); } catch(e) {}
 if (filterSaved && (filterSaved === "all" || TRACKS[filterSaved])) filter = filterSaved;
+let view = "rows"; try { if (localStorage.getItem("lb-view") === "columns") view = "columns"; } catch(e) {}
 
 const $ = s => document.querySelector(s);
 (() => { const r = document.getElementById("readme");
@@ -309,8 +334,9 @@ function render(){
   $("#pct").textContent = pct + "%"; $("#barFill").style.width = pct + "%";
   renderFilters();
   const visible = cards.filter(c => filter === "all" || c.track === filter);
-  const scrolls = {};
-  document.querySelectorAll(".list[data-list]").forEach(l => { scrolls[l.dataset.list] = l.scrollTop; });
+  const scrolls = listScrolls();
+  $("#board").classList.toggle("rows", view === "rows");
+  document.querySelectorAll("[data-view]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
   $("#board").innerHTML = COLS.map(col => {
     const list = visible.filter(c => c.status === col.id).sort((a,b) => (a.order??0) - (b.order??0));
     return `<section class="col" data-col="${col.id}" aria-label="${col.label}">
@@ -327,22 +353,39 @@ function render(){
 
 // Each board shows up to six cards, then scrolls inside itself.
 const MAX_VISIBLE = 6;
+function listScrolls(){ const s = {}; document.querySelectorAll(".list[data-list]").forEach(l => { s[l.dataset.list] = {t: l.scrollTop, l: l.scrollLeft}; }); return s; }
 function capLists(scrolls = {}){
+  const rows = $("#board").classList.contains("rows");
   document.querySelectorAll("textarea[data-note]").forEach(grow);
   document.querySelectorAll(".list[data-list]").forEach(list => {
     const items = list.querySelectorAll(":scope > .card");
     const range = list.parentElement.querySelector(".range");
+    const saved = scrolls[list.dataset.list] || {};
     list.style.maxHeight = ""; list.classList.remove("capped"); list.onscroll = null;
-    if (items.length <= MAX_VISIBLE) { if (range) range.textContent = ""; return; }
-    const last = items[MAX_VISIBLE - 1];
-    list.style.maxHeight = (last.offsetTop + last.offsetHeight + 2) + "px";
+    if (range) range.textContent = "";
+    if (rows) {
+      // Row view: cards sit side by side and the row scrolls sideways.
+      if (saved.l) list.scrollLeft = saved.l;
+      const update = () => {
+        const left = list.scrollLeft, right = left + list.clientWidth;
+        let first = 0, last = 0;
+        items.forEach((it, i) => { const mid = it.offsetLeft + it.offsetWidth / 2; if (mid >= left && !first) first = i + 1; if (mid <= right) last = i + 1; });
+        if (range) range.textContent = items.length && (last - first + 1) < items.length ? `${first || 1}–${Math.max(last, first || 1)} of ${items.length}` : "";
+      };
+      list.onscroll = update; update();
+      return;
+    }
+    // Column view: each board shows up to six cards, then scrolls inside itself.
+    if (items.length <= MAX_VISIBLE) return;
+    const lastCard = items[MAX_VISIBLE - 1];
+    list.style.maxHeight = (lastCard.offsetTop + lastCard.offsetHeight + 2) + "px";
     list.classList.add("capped");
-    if (scrolls[list.dataset.list]) list.scrollTop = scrolls[list.dataset.list];
+    if (saved.t) list.scrollTop = saved.t;
     const update = () => {
       const top = list.scrollTop, bottom = top + list.clientHeight;
-      let first = 0, lastSeen = 0;
-      items.forEach((it, i) => { const mid = it.offsetTop + it.offsetHeight / 2; if (mid >= top && !first) first = i + 1; if (mid <= bottom) lastSeen = i + 1; });
-      if (range) range.textContent = `${first || 1}–${Math.max(lastSeen, first || 1)} of ${items.length}`;
+      let first = 0, last = 0;
+      items.forEach((it, i) => { const mid = it.offsetTop + it.offsetHeight / 2; if (mid >= top && !first) first = i + 1; if (mid <= bottom) last = i + 1; });
+      if (range) range.textContent = `${first || 1}–${Math.max(last, first || 1)} of ${items.length}`;
     };
     list.onscroll = update; update();
   });
@@ -353,7 +396,6 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => capL
 
 // Notes save as you type. The Move menu replaces the old buttons.
 function grow(t){ t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }
-const listScrolls = () => { const s = {}; document.querySelectorAll(".list[data-list]").forEach(l => { s[l.dataset.list] = l.scrollTop; }); return s; };
 const noteTimers = {};
 document.addEventListener("input", e => {
   const t = e.target.closest && e.target.closest("textarea[data-note]"); if (!t) return;
@@ -467,6 +509,7 @@ document.addEventListener("click", async e => {
     notify(err || "Progress imported."); return;
   }
   if (b.dataset.dismiss){ $("#notice").hidden = true; return; }
+  if (b.dataset.view){ view = b.dataset.view; try { localStorage.setItem("lb-view", view); } catch(_){} render(); return; }
   if (b.dataset.f){ filter = b.dataset.f; try{localStorage.setItem("lb-filter", filter);}catch(_){} render(); return; }
   if (b.dataset.dnfask){ dnfAsk = b.dataset.dnfask; render(); return; }
   if (b.dataset.dnfcancel){ dnfAsk = null; render(); return; }

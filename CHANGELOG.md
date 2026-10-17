@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.0 (2026-10-16)
+
+- Renamed boards: Up next is now To do, and In progress is now Doing
+- New row view, the default: each board is a row and its cards scroll sideways, which reads better on phones
+- Rows and Columns toggle above the board, remembered per browser
+
 ## v1.3.0 (2026-10-16)
 
 - Replaced the floppy disk cards with clean rounded cards: track chip, two-line description, and a footer with the link, Notes, and Move
