@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.6.0 (2026-10-16)
+
+- Each track has its own geometric shape in its color, in filters, the Read me, and card chips
+- Inter for notes
+
 ## v1.5.0 (2026-10-16)
 
 - Inter for body and UI text
