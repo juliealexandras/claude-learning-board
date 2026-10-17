@@ -118,7 +118,7 @@ A weekly GitHub Action checks every link and opens an issue when one breaks. Ano
 - The board is a dark, rounded kanban: each card has a track chip, a full description, and its link as highlighted text with an external link icon.
 - Boards show as rows by default, with cards side by side, which reads well on phones. Switch to **Columns** with the toggle above the board; the board remembers your choice.
 - In column view, each board shows six cards, then scrolls inside itself with a counter like "1–6 of 17".
-- Body text is Inter. Headings use Atkinson Hyperlegible, a typeface designed for low-vision readers. Notes use Verdana for easy reading. All fonts are free and load from Google Fonts. Fonts load from Google Fonts and fall back to system fonts offline.
+- Body text is Inter. Headings use Atkinson Hyperlegible, a typeface designed for low-vision readers. All fonts are free and load from Google Fonts. Fonts load from Google Fonts and fall back to system fonts offline.
 - The board works on phones.
 - Some cards point to products that may need a paid plan, such as Claude Design and Figma Dev Mode MCP.
 - Each card shows when its link was last checked.
