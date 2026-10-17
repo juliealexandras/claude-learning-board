@@ -119,6 +119,11 @@ h1{font-family:var(--body);font-weight:400;font-size:clamp(26px,3.4vw,34px);line
 .notes{margin:0 -12px;padding:0 12px 12px}
 .card textarea.note{font:13px/1.5 var(--note);background:var(--bg);border:1px solid var(--line-soft);border-radius:var(--r-sm);color:var(--ink);padding:8px 10px;min-height:60px;resize:none;overflow:hidden;width:100%}
 .card textarea.note::placeholder{color:var(--faint)}
+.note-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
+.note-chip{font:12px var(--body);border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:99px;padding:3px 10px;cursor:pointer}
+.note-chip:hover{color:var(--ink);border-color:var(--faint)}
+.note-chip[aria-pressed="true"]{color:var(--ink);border-color:var(--c);background:color-mix(in srgb,var(--c) 18%,transparent)}
+.note-chip.danger{margin-left:auto;color:#FF8A7A;border-color:color-mix(in srgb,#FF8A7A 35%,transparent)}
 .card[data-status="dnf"]{opacity:.62;cursor:default}
 .card[data-status="dnf"]:hover{opacity:.85}
 
@@ -183,7 +188,7 @@ textarea,input,select{font:14px var(--body);color:var(--ink);background:var(--bg
           <li>Drag a card to move it, or use <b>Move</b> on the card.</li>
           <li>Switch between <b>Rows</b> and <b>Columns</b> above the board.</li>
           <li>Open <b>Notes</b> on a card to write. Notes save as you go.</li>
-          <li><b>Did not finish</b> is for cards that weren't useful or are gone.</li>
+          <li><b>Did not finish</b> is for cards that weren't useful or are gone. Pick a reason in the card's notes.</li>
           <li><b>+</b> on a board adds your own link to Misc.</li>
         </ul>
       </div>
@@ -273,8 +278,7 @@ const ICON = {
 function moveOptions(c){
   const o = ['<option value="" selected disabled>Move</option>'];
   for (const col of COLS) if (col.id !== "dnf" && col.id !== c.status) o.push(`<option value="${col.id}">${col.label}</option>`);
-  if (c.status !== "dnf") o.push(`<optgroup label="Did not finish">${REASONS.map(r => `<option value="dnf:${r}">${r}</option>`).join("")}</optgroup>`);
-  o.push('<option value="remove">Remove card</option>');
+  if (c.status !== "dnf") o.push('<option value="dnf">Did not finish</option>');
   return o.join("");
 }
 
@@ -296,6 +300,7 @@ function cardHTML(c){
   const notes = open ? `<div class="notes">
       <label class="sr" for="note-${c.id}">Notes for ${esc(c.title)}</label>
       <textarea class="note" id="note-${c.id}" data-note="${c.id}" rows="2" placeholder="${canWrite ? "What did you learn? What will you try next?" : "No notes yet"}" ${canWrite ? "" : "readonly"}>${esc(c.note || "")}</textarea>
+      ${canWrite ? `<div class="note-chips">${dnf ? `<span class="meta">Why?</span>` + REASONS.map(r => `<button type="button" class="note-chip" data-setreason="${c.id}" data-reason="${r}" aria-pressed="${c.dnfReason === r}">${r}</button>`).join("") : ""}<button type="button" class="note-chip danger" data-askdel="${c.id}">Remove card</button></div>` : ""}
     </div>` : "";
   return `<article class="card" draggable="${canWrite && !dnf}" data-id="${c.id}" data-status="${c.status}" style="--c:${t.c}">
     <div class="card-top"><span class="code">${code}${sub ? ` · ${sub}` : ""}</span><span class="track">${esc(t.label)}</span></div>
@@ -410,8 +415,7 @@ document.addEventListener("focusout", e => {
 document.addEventListener("change", e => {
   const s = e.target.closest && e.target.closest("select[data-moveselect]"); if (!s) return;
   const id = s.dataset.moveselect, v = s.value; s.value = "";
-  if (v === "remove") { confirmDel = id; render(); return; }
-  if (v.startsWith("dnf:")) { moveTo(id, "dnf", v.slice(4)); return; }
+  if (v === "dnf") { openId = id; moveTo(id, "dnf"); return; }
   moveTo(id, v);
 });
 // Let people select text in notes without starting a drag.
@@ -420,6 +424,8 @@ document.addEventListener("mousedown", e => {
   d.draggable = canWrite && d.dataset.status !== "dnf" && !e.target.closest("textarea,select,a,button");
 });
 function persistNote(id, v){ const c = cards.find(x => x.id === id); if (c && (c.note || "") !== v){ c.note = v; save(); } }
+
+function setReason(id, r){ const c = cards.find(x => x.id === id); if (c){ c.dnfReason = c.dnfReason === r ? "" : r; save(); render(); } }
 
 const maxOrder = status => Math.max(0, ...cards.filter(c => c.status === status).map(c => c.order ?? 0));
 
@@ -510,6 +516,7 @@ document.addEventListener("click", async e => {
   }
   if (b.dataset.dismiss){ $("#notice").hidden = true; return; }
   if (b.dataset.view){ view = b.dataset.view; try { localStorage.setItem("lb-view", view); } catch(_){} render(); return; }
+  if (b.dataset.setreason){ setReason(b.dataset.setreason, b.dataset.reason); return; }
   if (b.dataset.f){ filter = b.dataset.f; try{localStorage.setItem("lb-filter", filter);}catch(_){} render(); return; }
   if (b.dataset.dnfask){ dnfAsk = b.dataset.dnfask; render(); return; }
   if (b.dataset.dnfcancel){ dnfAsk = null; render(); return; }

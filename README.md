@@ -92,7 +92,8 @@ Claude Code reads `CLAUDE.md` automatically, edits `cards.js`, and runs the vali
 - **Change the plan:** edit `cards.js`, then run `node scripts/validate-cards.mjs` to check it. Reload the board to see new cards.
 - **Add a card from the board:** select **+** at the top of any board. New cards default to Misc and include an optional "Why it's useful" field.
 - **Take notes:** select the Notes icon on any card. Notes save as you type.
-- **Move a card:** drag it, or use the **Move** menu on the card. The menu also sets a card aside as **Did not finish** with a reason, and removes cards.
+- **Move a card:** drag it, or use the **Move** menu on the card. Choose **Did not finish** to set a card aside, then pick a reason in its notes: Not useful, Archived, or Unavailable.
+- **Remove a card:** open its notes and select **Remove card**.
 
 ## Contributing
 

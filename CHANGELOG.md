@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.4.1 (2026-10-16)
+
+- Shorter Move menu: the other boards plus Did not finish
+- Did not finish reasons and Remove card are now chips in the notes panel, which opens when you choose Did not finish
+
 ## v1.4.0 (2026-10-16)
 
 - Renamed boards: Up next is now To do, and In progress is now Doing
