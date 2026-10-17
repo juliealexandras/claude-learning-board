@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.0 (2026-10-16)
+
+- Inter for body and UI text
+- Atkinson Hyperlegible for headings, replacing Futura PT and Jost
+- Full card descriptions and equal card heights
+
 ## v1.4.2 (2026-10-16)
 
 - Removed the card code and date line; the Move menu now sits there beside the track chip
