@@ -92,32 +92,33 @@ h1{font-family:var(--body);font-weight:400;font-size:clamp(26px,3.4vw,34px);line
 .empty{font-size:13px;color:var(--faint);padding:10px 6px}
 
 /* Card */
-.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 12px 0;display:flex;flex-direction:column;gap:6px;cursor:grab;min-width:0;transition:background .15s,border-color .15s}
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 12px 0;display:flex;flex-direction:column;gap:4px;cursor:grab;min-width:0;transition:background .15s,border-color .15s}
 .card:hover{background:var(--card-hover)}
 .card.dragging{opacity:.4}
-.card-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card-top{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:28px}
+.card-top .track{margin-left:auto}
 .code{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .track{flex:none;font-size:12px;font-weight:500;padding:2px 9px;border-radius:99px;color:var(--c);background:color-mix(in srgb,var(--c) 16%,transparent);border:1px solid color-mix(in srgb,var(--c) 28%,transparent);white-space:nowrap}
-.card h3{font:500 15px/1.35 var(--body);margin:4px 0 0;display:flex;gap:6px;align-items:flex-start;overflow-wrap:anywhere}
+.card h3{font:500 15px/1.35 var(--body);margin:6px 0 0;display:flex;gap:6px;align-items:flex-start;overflow-wrap:anywhere}
 .card h3 .ico{color:var(--good);margin-top:3px}
-.detail{margin:0;font-size:13px;line-height:1.45;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
-.card-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:8px -12px 0;padding:8px 12px;border-top:1px solid var(--line-soft);min-height:40px}
-.link-wrap{flex:0 1 auto;min-width:0;line-height:1.6}
-.link{display:inline;font-size:13px;-webkit-box-decoration-break:clone;box-decoration-break:clone;color:var(--ink);text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--c) 70%,transparent);text-decoration-thickness:1.5px;text-underline-offset:3px;
-  background:linear-gradient(transparent 62%,color-mix(in srgb,var(--c) 22%,transparent) 62%);padding:0 2px;border-radius:2px;min-width:0;overflow-wrap:anywhere}
-.link:hover{background:color-mix(in srgb,var(--c) 26%,transparent)}
-.link .ico{width:12px;height:12px;color:var(--c);vertical-align:-1px}
-.link-none{font-size:12px;color:var(--faint)}
-.foot-actions{display:flex;align-items:center;gap:4px;margin-left:auto}
-.icon-btn{position:relative;display:inline-grid;place-items:center;width:28px;height:28px;color:var(--muted);background:transparent;border:0;border-radius:var(--r-sm);cursor:pointer}
-.icon-btn .ico{width:15px;height:15px}
-.icon-btn:hover{background:var(--line-soft);color:var(--ink)}
-.icon-btn.has{color:var(--ink)}
-.icon-btn.has::after{content:"";position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px var(--card)}
+.detail{margin:0 0 8px;font-size:13px;line-height:1.45;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.card-link{margin:2px -12px 0;padding:9px 12px;border-top:1px solid var(--line-soft);min-width:0}
+.link{display:inline-flex;align-items:center;gap:5px;max-width:100%;font-size:13px;color:var(--c);text-decoration:none;vertical-align:top}
+.link-text{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:underline;text-decoration-color:currentColor;text-decoration-thickness:1px;text-underline-offset:3px}
+.link:hover .link-text{text-decoration-thickness:2px}
+.link .ico{width:12px;height:12px;flex:none}
+.notes-toggle{display:flex;justify-content:space-between;align-items:center;width:calc(100% + 24px);margin:0 -12px;padding:9px 12px;border:0;border-top:1px solid var(--line-soft);background:transparent;color:var(--muted);font:13px var(--body);cursor:pointer;border-radius:0 0 var(--r-md) var(--r-md);text-align:left}
+.card-link + .notes-toggle,.detail + .notes-toggle,h3 + .notes-toggle{margin-top:0}
+.notes-toggle:hover{color:var(--ink);background:var(--line-soft)}
+.notes-toggle > span{display:inline-flex;align-items:center;gap:7px}
+.notes-toggle.has > span::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--c)}
+.notes-toggle .ico{width:14px;height:14px;transition:transform .2s}
+.notes-toggle[aria-expanded="true"]{color:var(--ink);border-radius:0}
+.notes-toggle[aria-expanded="true"] .ico{transform:rotate(180deg)}
 .card select.move{flex:none;width:76px;-webkit-appearance:none;appearance:none;font:12px var(--body);color:var(--muted);border:1px solid var(--line);border-radius:var(--r-sm);padding:5px 28px 5px 10px;line-height:1.3;cursor:pointer;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2 3.5l3 3 3-3' fill='none' stroke='%238B8F9A' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 10px center}
 .card select.move:hover{color:var(--ink);border-color:var(--faint)}
 .card select.move option,.card select.move optgroup{color:var(--ink);background:var(--card)}
-.notes{margin:0 -12px;padding:0 12px 12px}
+.notes{margin:0 -12px;padding:4px 12px 12px;background:var(--line-soft);border-radius:0 0 var(--r-md) var(--r-md)}
 .card textarea.note{font:13px/1.5 var(--note);background:var(--bg);border:1px solid var(--line-soft);border-radius:var(--r-sm);color:var(--ink);padding:8px 10px;min-height:60px;resize:none;overflow:hidden;width:100%}
 .card textarea.note::placeholder{color:var(--faint)}
 .note-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}
@@ -274,6 +275,7 @@ const ICON = {
   note: svg('<path d="M4 2h5.5L12.5 5v9H4z"/><path d="M9.5 2v3h3M6.5 8.5h3.5M6.5 11h3.5"/>'),
   plus: svg('<path d="M8 3v10M3 8h10"/>'),
   check: svg('<path d="M3.5 8.5l3 3 6-7"/>'),
+  chev: svg('<path d="M4 6l4 4 4-4"/>'),
 };
 
 function moveOptions(c){
@@ -286,28 +288,30 @@ function moveOptions(c){
 function cardHTML(c){
   const t = TRACKS[c.track] || {label:c.track||"Other", c:"var(--muted)"};
   const dnf = c.status === "dnf", open = openId === c.id;
-  const code = /^[a-z]\d+$/i.test(c.id) ? c.id[0].toUpperCase() + "-" + c.id.slice(1) : "New";
-  const sub = dnf ? esc(c.dnfReason || "Set aside") : (c.lastChecked ? `<span title="Link last checked">${fmtDate(c.lastChecked)}</span>` : "");
+  const move = canWrite
+    ? `<label class="sr" for="move-${c.id}">Move ${esc(c.title)}</label><select class="move" id="move-${c.id}" data-moveselect="${c.id}">${moveOptions(c)}</select>`
+    : "";
   const link = c.url
-    ? `<span class="link-wrap"><a class="link" href="${esc(c.url)}" target="_blank" rel="noopener">${esc(c.urlLabel || "Open resource")}&nbsp;${ICON.ext}<span class="sr"> (opens in a new tab)</span></a></span>`
-    : `<span class="link-none">No link</span>`;
-  let actions;
-  if (canWrite && confirmDel === c.id) {
-    actions = `<span class="meta">Remove?</span><button class="btn danger" data-del="${c.id}">Remove</button><button class="btn ghost" data-canceldel="1">Keep</button>`;
-  } else {
-    actions = `<button class="icon-btn${c.note ? " has" : ""}" data-open="${c.id}" aria-expanded="${open}" aria-label="${open ? "Close notes" : "Notes"} for ${esc(c.title)}">${ICON.note}</button>`;
-    if (canWrite) actions += `<label class="sr" for="move-${c.id}">Move ${esc(c.title)}</label><select class="move" id="move-${c.id}" data-moveselect="${c.id}">${moveOptions(c)}</select>`;
-  }
-  const notes = open ? `<div class="notes">
+    ? `<div class="card-link"><a class="link" href="${esc(c.url)}" target="_blank" rel="noopener" title="${esc(c.urlLabel || "Open resource")}"><span class="link-text">${esc(c.urlLabel || "Open resource")}</span>${ICON.ext}<span class="sr"> (opens in a new tab)</span></a></div>`
+    : "";
+  let notes = "";
+  if (open) {
+    const reasons = dnf ? `<span class="meta">Why?</span>` + REASONS.map(r => `<button type="button" class="note-chip" data-setreason="${c.id}" data-reason="${r}" aria-pressed="${c.dnfReason === r}">${r}</button>`).join("") : "";
+    const remove = confirmDel === c.id
+      ? `<span class="meta remove-ask">Remove this card?</span><button type="button" class="note-chip danger" data-del="${c.id}">Remove</button><button type="button" class="note-chip" data-canceldel="1">Keep</button>`
+      : `<button type="button" class="note-chip danger" data-askdel="${c.id}">Remove card</button>`;
+    notes = `<div class="notes" id="notes-${c.id}">
       <label class="sr" for="note-${c.id}">Notes for ${esc(c.title)}</label>
       <textarea class="note" id="note-${c.id}" data-note="${c.id}" rows="2" placeholder="${canWrite ? "What did you learn? What will you try next?" : "No notes yet"}" ${canWrite ? "" : "readonly"}>${esc(c.note || "")}</textarea>
-      ${canWrite ? `<div class="note-chips">${dnf ? `<span class="meta">Why?</span>` + REASONS.map(r => `<button type="button" class="note-chip" data-setreason="${c.id}" data-reason="${r}" aria-pressed="${c.dnfReason === r}">${r}</button>`).join("") : ""}<button type="button" class="note-chip danger" data-askdel="${c.id}">Remove card</button></div>` : ""}
-    </div>` : "";
-  return `<article class="card" draggable="${canWrite && !dnf}" data-id="${c.id}" data-status="${c.status}" style="--c:${t.c}">
-    <div class="card-top"><span class="code">${code}${sub ? ` · ${sub}` : ""}</span><span class="track">${esc(t.label)}</span></div>
+      ${canWrite ? `<div class="note-chips">${reasons}${remove}</div>` : ""}
+    </div>`;
+  }
+  return `<article class="card${open ? " open" : ""}" draggable="${canWrite && !dnf}" data-id="${c.id}" data-status="${c.status}" style="--c:${t.c}">
+    <div class="card-top">${move}<span class="track">${esc(t.label)}</span></div>
     <h3>${c.status === "done" ? ICON.check : ""}<span>${esc(c.title)}</span></h3>
     ${c.detail ? `<p class="detail">${fmt(c.detail)}</p>` : ""}
-    <div class="card-foot">${link}<div class="foot-actions">${actions}</div></div>
+    ${link}
+    <button type="button" class="notes-toggle${c.note ? " has" : ""}" data-open="${c.id}" aria-expanded="${open}" aria-controls="notes-${c.id}"><span>Notes</span>${ICON.chev}</button>
     ${notes}
   </article>`;
 }
@@ -428,6 +432,31 @@ function persistNote(id, v){ const c = cards.find(x => x.id === id); if (c && (c
 
 function setReason(id, r){ const c = cards.find(x => x.id === id); if (c){ c.dnfReason = c.dnfReason === r ? "" : r; save(); render(); } }
 
+document.addEventListener("click", e => {
+  if (!openId) return;
+  const inside = e.target.closest && e.target.closest(".card");
+  if (inside && inside.dataset.id === openId) return;
+  const t = document.querySelector(`textarea[data-note="${openId}"]`);
+  if (t && !t.readOnly) { clearTimeout(noteTimers[openId]); persistNote(openId, t.value); }
+  if (inside && e.target.closest("[data-open]")) return; // another card's Notes button opens that card instead
+  closeNotes();
+});
+// Close the open notes panel in place, without redrawing the board.
+function closeNotes(){
+  const card = document.querySelector(`.card[data-id="${openId}"]`);
+  const t = card && card.querySelector("textarea[data-note]");
+  openId = null; confirmDel = null;
+  if (!card) return;
+  card.classList.remove("open");
+  const toggle = card.querySelector("[data-open]");
+  if (toggle) { toggle.setAttribute("aria-expanded", "false"); if (t) toggle.classList.toggle("has", !!t.value.trim()); }
+  const panel = card.querySelector(".notes"); if (panel) panel.remove();
+  capLists(listScrolls());
+}
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && openId) { const id = openId; openId = null; confirmDel = null; render(); const b = document.querySelector(`[data-open="${id}"]`); if (b) b.focus(); }
+});
+
 const maxOrder = status => Math.max(0, ...cards.filter(c => c.status === status).map(c => c.order ?? 0));
 
 const STORE = "claude-learning-board-v2", LEGACY = "claude-learning-board-v1";
@@ -528,7 +557,7 @@ document.addEventListener("click", async e => {
     const idx = COLS.findIndex(x => x.id === c.status) + Number(b.dataset.move);
     if (COLS[idx]) moveTo(c.id, COLS[idx].id); return;
   }
-  if (b.dataset.open){ openId = openId === b.dataset.open ? null : b.dataset.open; confirmDel = null; render(); return; }
+  if (b.dataset.open){ openId = openId === b.dataset.open ? null : b.dataset.open; confirmDel = null; render(); const f = openId && document.querySelector(`textarea[data-note="${openId}"]`); if (f && !f.readOnly) f.focus(); return; }
   if (b.dataset.savenote){
     const id = b.dataset.savenote, v = document.getElementById("note-"+id).value;
     const c = cards.find(x => x.id === id); if (c) { c.note = v; save(); render(); }

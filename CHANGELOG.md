@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.4.2 (2026-10-16)
+
+- Removed the card code and date line; the Move menu now sits there beside the track chip
+- Links show on one line in the track color, underlined, with an ellipsis when long
+- Notes is a full-width row under the link that expands into a text field and closes when you tap elsewhere
+
 ## v1.4.1 (2026-10-16)
 
 - Shorter Move menu: the other boards plus Did not finish
