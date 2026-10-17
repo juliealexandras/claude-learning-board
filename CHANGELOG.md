@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.3.0 (2026-10-16)
+
+- Replaced the floppy disk cards with clean rounded cards: track chip, two-line description, and a footer with the link, Notes, and Move
+- Links are highlighted, underlined text with an external link icon
+- Soft rounded corners on boards, panels, chips, and controls
+- Progress shows in a compact pill, and each board header has its own + button
+- Notes open from an icon and save as you type, in Verdana
+
 ## v1.2.0 (2026-10-16)
 
 - Simpler disks: one Move menu replaces the move, DNF, notes, and remove buttons
